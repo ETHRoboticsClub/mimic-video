@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+# Prevent Apex's FusedRMSNorm from replacing T5LayerNorm — Apex's CUDA
+# extensions are not compiled for sm_120 (Blackwell / RTX 50xx GPUs).
+import sys
+sys.modules["apex.normalization"] = None  # type: ignore[assignment]
+
 import json
 import os
 import pathlib
@@ -71,6 +76,7 @@ def load_video2world2action_pipeline(
         device="cuda",
         torch_dtype=dtype,
         load_ema_to_reg=False,
+        offload_text_encoder=True,
     )
 
     world2action_pipe = World2ActionPipeline.from_config(

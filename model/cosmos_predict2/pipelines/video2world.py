@@ -455,11 +455,13 @@ class Video2WorldPipeline(BasePipeline):
 
         if offload_to_host:
             self.text_encoder.to(device="cuda")
+            self.text_encoder.device = "cuda"
 
         embeddings = self.text_encoder.encode_prompts(prompts, max_length=max_length, return_mask=return_mask)  # type: ignore
 
         if offload_to_host:
             self.text_encoder.to(device="cpu")
+            self.text_encoder.device = "cpu"
             gc.collect()
             torch.cuda.empty_cache()
 

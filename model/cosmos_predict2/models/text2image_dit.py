@@ -1512,7 +1512,7 @@ class MiniTrainDIT(WeightTrainingStat):
                 f"{x_B_T_H_W_D.shape} != {extra_pos_emb_B_T_H_W_D_or_T_H_W_B_D.shape}"
             )
 
-        if use_cuda_graphs:
+        if use_cuda_graphs and not return_hidden_states:
             shapes_key = create_cuda_graph(
                 self.cuda_graphs,
                 self.blocks,

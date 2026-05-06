@@ -1,5 +1,13 @@
 GPUS=(0)
 
+# transformer_engine locates libnvrtc via CUDA_HOME before falling back to ldconfig.
+# With uv-managed CUDA packages there is no system CUDA install, so point CUDA_HOME
+# at the venv's nvidia/cuda_nvrtc package so the shared library is found at import time.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+MODEL_VENV="${SCRIPT_DIR}/../../model/.venv"
+export CUDA_HOME="${MODEL_VENV}/lib/python3.10/site-packages/nvidia/cuda_nvrtc"
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
 fifo="/tmp/gpuq.$$"
 mkfifo "$fifo"
 exec 3<>"$fifo"
@@ -26,7 +34,7 @@ launch() {
   ) &
 }
 
-checkpoint_dir=...
+checkpoint_dir=/home/ethrc/Desktop/mimic-video/model/checkpoints
 
 declare -A goal_half=(
   [img_h]=5
@@ -124,7 +132,7 @@ declare -A spatial_one=(
 models=(object_full)
 
 execute_actions=(5)
-stop_steps=(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35)
+stop_steps=(0 20 35)
 
 for execute_steps in "${execute_actions[@]}"; do
   for stop_after in "${stop_steps[@]}"; do

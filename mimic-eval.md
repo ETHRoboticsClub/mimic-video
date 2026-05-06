@@ -5,6 +5,17 @@ ec2 ami type prefered: 'Deep Learning OSS Nvidia Driver AMI GPU PyTorch 2.7 (Ubu
 
 # make sure enough space, only the checkpoints are taking up to 100GB
 
+aws login --remote
+aws s3 sync s3://ethrc-ml-data-916780037007/mimic/ . --region us-east-1 
+
+# eval
+cd ../eval/libero
+uv pip install -r LIBERO/requirements.txt
+uv pip install -e LIBERO
+
+bash eval_single.sh
+
+
 # mimic video repo
 git clone https://github.com/mimic-video/mimic-video.git
 cd mimic-video/model
@@ -22,5 +33,5 @@ cd ../eval/libero
 uv pip install -r LIBERO/requirements.txt
 uv pip install -e LIBERO
 
-bash eval_single.sh
+bash eval_single_gpu.sh
 
