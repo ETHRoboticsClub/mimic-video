@@ -22,13 +22,5 @@ cd ../eval/libero
 uv pip install -r LIBERO/requirements.txt
 uv pip install -e LIBERO
 
-# modify eval.sh: 
-# set checkpoint dir (should be under .../mimic-video/model/checkpoints)
-# -adjust GPUs  (depending on num of gpus) 
-# -optionally select the relevant task under models=(....)
-# MODIFY line 8 for i in $(seq 0 $(( 1 * ${#GPUS[@]} - 1 ))); do
-  g=$((i % ${#GPUS[@]}))
-  echo "$g" >&3
-done
-bash eval.sh
+bash eval_single.sh
 
