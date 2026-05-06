@@ -22,7 +22,7 @@ Creating and using such a `World2ActionPipeline` for inference is done in [eval/
 
 ## Config system
 
-The config system is generally a [hydra](hydra.cc) setup but quite convoluted.
+The config system is generally a [hydra](https://hydra.cc) setup but quite convoluted.
 
 Most of the training config uses the python API to register individual config groups and full configs ("experiments") choosing values from each group. [configs/experiment/video2world.py](./model/cosmos_predict2/configs/experiment/video2world.py) registers config combinations to train video models and [configs/experiment/world2action.py](./model/cosmos_predict2/configs/experiment/world2action.py) registers config combinations to train action decoders given a frozen video model.
 
