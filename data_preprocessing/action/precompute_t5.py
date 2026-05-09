@@ -2,9 +2,32 @@ import argparse
 import pathlib
 
 import numpy as np
+import torch
+import torch.nn as nn
 import tqdm
 import zarr
 from numcodecs import Blosc
+
+# Apex's FusedRMSNorm CUDA extension is not compiled for sm_120 (RTX 5090).
+# transformers' T5 prefers it when apex is installed; swap in a torch-native
+# RMSNorm before any T5 model class is instantiated.
+from transformers.models.t5 import modeling_t5
+
+if modeling_t5.T5LayerNorm.__module__.startswith("apex"):
+    class _RMSNormPure(nn.Module):
+        def __init__(self, hidden_size, eps=1e-6):
+            super().__init__()
+            self.weight = nn.Parameter(torch.ones(hidden_size))
+            self.variance_epsilon = eps
+
+        def forward(self, hidden_states):
+            in_dtype = hidden_states.dtype
+            x32 = hidden_states.to(torch.float32)
+            variance = x32.pow(2).mean(-1, keepdim=True)
+            x32 = x32 * torch.rsqrt(variance + self.variance_epsilon)
+            return self.weight * x32.to(in_dtype)
+
+    modeling_t5.T5LayerNorm = _RMSNormPure
 
 from imaginaire.auxiliary.text_encoder import CosmosT5TextEncoder, CosmosT5TextEncoderConfig
 from imaginaire.constants import T5_MODEL_DIR

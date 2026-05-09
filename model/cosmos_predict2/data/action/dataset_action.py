@@ -37,6 +37,7 @@ class MimicDataset(torch.utils.data.Dataset):
         should_include_padded_tails: bool,
         seed: int = 42,
         num_val_episodes: int = 1,
+        val_episode_indices: list[int] | None = None,
         train: bool = True,
         verbose: bool = False,
     ) -> None:
@@ -63,7 +64,15 @@ class MimicDataset(torch.utils.data.Dataset):
 
         reader_data_components = copy.deepcopy(self._data_components)
 
-        val_mask = self.get_val_mask(n_episodes=len(self._episode_paths), n_val_episodes=num_val_episodes, seed=seed)
+        if val_episode_indices is not None:
+            val_mask = self.get_val_mask_from_indices(
+                episode_paths=self._episode_paths,
+                val_episode_indices=val_episode_indices,
+            )
+        else:
+            val_mask = self.get_val_mask(
+                n_episodes=len(self._episode_paths), n_val_episodes=num_val_episodes, seed=seed
+            )
         val_mask = ~val_mask if train else val_mask
 
         self._stats_id = hashlib.sha256(
@@ -76,6 +85,7 @@ class MimicDataset(torch.utils.data.Dataset):
                     str(should_include_padded_tails),
                     str(seed),
                     str(num_val_episodes),
+                    str(val_episode_indices),
                     inspect.getsource(chunk_reader),
                     inspect.getsource(data_transforms_mod),
                     inspect.getsource(data_spec),
@@ -183,3 +193,25 @@ class MimicDataset(torch.utils.data.Dataset):
         val_idxs = rng.choice(n_episodes, size=n_val_episodes, replace=False)
         val_mask[val_idxs] = True
         return val_mask
+
+    @staticmethod
+    def get_val_mask_from_indices(
+        episode_paths: list[pathlib.Path], val_episode_indices: list[int]
+    ) -> np.ndarray:
+        # Filenames must be `episode_{i:04d}.zarr` for explicit indexing to be unambiguous.
+        path_ep_idx = []
+        for p in episode_paths:
+            stem = p.stem
+            if not stem.startswith("episode_"):
+                msg = f"val_episode_indices requires episode_NNNN.zarr filenames; got {p}"
+                raise ValueError(msg)
+            path_ep_idx.append(int(stem.split("_")[-1]))
+
+        path_ep_idx_set = set(path_ep_idx)
+        missing = sorted(set(val_episode_indices) - path_ep_idx_set)
+        if missing:
+            msg = f"val_episode_indices contains episodes not present on disk: {missing}"
+            raise ValueError(msg)
+
+        val_set = set(val_episode_indices)
+        return np.array([ei in val_set for ei in path_ep_idx], dtype=bool)
