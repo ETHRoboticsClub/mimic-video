@@ -1,7 +1,21 @@
 model/checkpoints
 eval/*/results
+eval/*/results_*/
+eval/*/logs/
+eval/*/output.txt
 nohup.out
 uv.lock
 
 __pycache__/
 .venv/
+
+# Datasets (regenerable, huge — keep out of git)
+data/
+
+# IDE / agent state
+.idea/
+.claude/
+
+# Sample / viewer outputs
+tommaso/cosmos_samples/
+tommaso/viewer/

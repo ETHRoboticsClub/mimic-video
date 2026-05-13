@@ -102,7 +102,8 @@ for video_ckpt, data_config, xattn_layer_idx, lr, bsz in it.product(
     cfg["dataloader_train"] = {"batch_size": L(get_local_batch_size)(global_bsz=bsz)}
 
     if "libero" in data_config:
-        cfg["checkpoint"]["save_iter"] = 99999999
+        # save_iter follows BASE default (1000); override per-run via CLI as needed.
+        # Validation stays off — full val pass at iter 0 is multi-day.
         cfg["trainer"]["run_validation"] = False
 
     cs.store(

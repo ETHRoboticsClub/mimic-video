@@ -97,9 +97,7 @@ def load_state_dict_from_safetensors(file_path, torch_dtype=None):
 
 def load_state_dict_from_bin(file_path, torch_dtype=None):
     backend_args = None
-    state_dict = easy_io.load(
-        file_path, backend_args=backend_args, file_format="pt", map_location="cpu", weights_only=False
-    )
+    state_dict = torch.load(file_path, map_location="cpu", weights_only=False, mmap=True)
     if torch_dtype is not None:
         for i in state_dict:
             if isinstance(state_dict[i], torch.Tensor):

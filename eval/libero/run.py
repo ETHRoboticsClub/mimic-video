@@ -314,7 +314,7 @@ def eval_vam_libero(
     vam_stop_video_denoising_step: int,
     vam_num_execute_actions: int,
     task_suite_name: str,
-    num_trials_per_task: int = 50,
+    num_trials_per_task: int = 5,
     eval_rank: int = 0,
     eval_world_size: int = 1,
     num_steps_wait: int = 10,

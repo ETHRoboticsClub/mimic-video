@@ -47,14 +47,31 @@ def _load_tasks(dataset_dir: pathlib.Path) -> dict[int, str]:
     return {int(row.task_index): str(task) for task, row in df.iterrows()}
 
 
-def _decode_segment(video_path: pathlib.Path, from_ts: float, length: int, fps: int) -> np.ndarray:
-    vr = decord.VideoReader(str(video_path), ctx=decord.cpu(0))
+def _decode_segment(video_path: pathlib.Path, from_ts: float, length: int, fps: int) -> tuple[np.ndarray, int]:
+    """Decode a video segment, truncating to actual video length if the request runs past EOF.
+
+    Returns (frames, effective_length) where effective_length <= length.
+    """
+    vr = decord.VideoReader(str(video_path), ctx=decord.cpu(0), num_threads=1)
     start = int(round(from_ts * fps))
-    idx = list(range(start, start + length))
-    if idx[-1] >= len(vr):
-        msg = f"requested frame {idx[-1]} but video {video_path.name} has only {len(vr)} frames"
-        raise ValueError(msg)
-    return vr.get_batch(idx).asnumpy()  # (T, H, W, 3) uint8
+    end = start + length
+    if end > len(vr):
+        # HF fs26: some later episodes claim frames past EOF — truncate.
+        end = len(vr)
+    effective = end - start
+    if effective <= 0:
+        raise ValueError(f"video {video_path.name}: requested start frame {start} >= total {len(vr)}")
+    idx = list(range(start, end))
+    return vr.get_batch(idx).asnumpy(), effective  # (T, H, W, 3) uint8, T
+
+
+def _convert_safe(ep_row, **kwargs):
+    """Wrap _convert to catch decord/codec failures so the pool doesn't die."""
+    try:
+        return _convert(ep_row, **kwargs)
+    except Exception as e:
+        ep_idx = int(ep_row.get("episode_index", -1))
+        return f"FAIL ep {ep_idx}: {type(e).__name__}: {str(e)[:200]}"
 
 
 def _convert(
@@ -64,8 +81,26 @@ def _convert(
     out_dir: pathlib.Path,
     fps: int,
     overwrite: bool,
-    task_text: str,
+    tasks: dict[int, str],
 ) -> str:
+    # multi-task: episodes.parquet stores `tasks` as a list of task strings
+    # (one per task this episode covers — typically just 1)
+    ep_tasks = ep_row["tasks"]
+    if isinstance(ep_tasks, str):
+        ep_task_strs = [ep_tasks]
+    elif hasattr(ep_tasks, "__iter__"):
+        ep_task_strs = [str(t) for t in ep_tasks]
+    else:
+        ep_task_strs = [str(ep_tasks)]
+    if len(ep_task_strs) != 1:
+        msg = f"episode {ep_row['episode_index']}: expected exactly 1 task per episode, got {ep_task_strs}"
+        raise ValueError(msg)
+    task_text = ep_task_strs[0]
+    # sanity check: the task string should be one of the known tasks
+    known_task_strs = set(tasks.values())
+    if task_text not in known_task_strs:
+        msg = f"episode {ep_row['episode_index']}: task {task_text!r} not in known tasks {known_task_strs}"
+        raise ValueError(msg)
     ep_idx = int(ep_row["episode_index"])
     out_path = out_dir / f"episode_{ep_idx:04d}.zarr"
     if out_path.exists() and not overwrite:
@@ -82,8 +117,12 @@ def _convert(
     mask = df["episode_index"] == ep_idx
     sub = df.loc[mask].sort_values("frame_index").reset_index(drop=True)
     if len(sub) != length:
-        msg = f"episode {ep_idx}: parquet has {len(sub)} rows but meta says length={length}"
-        raise ValueError(msg)
+        # HF fs26 dataset has occasional mismatch between parquet row count and
+        # meta length. Truncate both action/state and video segment to min.
+        effective = min(len(sub), length)
+        print(f"WARN episode {ep_idx}: parquet has {len(sub)} rows but meta says length={length}; truncating to {effective}")
+        sub = sub.head(effective).reset_index(drop=True)
+        length = effective
 
     # action / state are fixed_size_list[14]; pyarrow→pandas yields ndarray-of-lists
     action = np.stack(sub["action"].to_numpy()).astype(np.float32)
@@ -98,14 +137,29 @@ def _convert(
         "wrist_rgb_right": "observation.images.right_wrist",
     }
     decoded = {}
+    effective_lengths = []
     for out_key, cam_key in cams.items():
         chunk = int(ep_row[f"videos/{cam_key}/chunk_index"])
         fid = int(ep_row[f"videos/{cam_key}/file_index"])
         from_ts = float(ep_row[f"videos/{cam_key}/from_timestamp"])
         vp = dataset_dir / "videos" / cam_key / f"chunk-{chunk:03d}" / f"file-{fid:03d}.mp4"
-        decoded[out_key] = _decode_segment(vp, from_ts, length, fps)
-        if decoded[out_key].shape != (length, 480, 640, 3):
-            msg = f"episode {ep_idx} {out_key}: shape {decoded[out_key].shape}, expected ({length},480,640,3)"
+        decoded[out_key], eff = _decode_segment(vp, from_ts, length, fps)
+        effective_lengths.append(eff)
+
+    # If any camera was truncated (video ran past EOF), align all cams + action/state to the min.
+    min_eff = min(effective_lengths)
+    if min_eff < length:
+        print(f"WARN episode {ep_idx}: video truncation, length {length} -> {min_eff}")
+        for out_key in list(decoded.keys()):
+            decoded[out_key] = decoded[out_key][:min_eff]
+        action = action[:min_eff]
+        state = state[:min_eff]
+        sub = sub.head(min_eff).reset_index(drop=True)
+        length = min_eff
+
+    for out_key, arr in decoded.items():
+        if arr.shape != (length, 480, 640, 3):
+            msg = f"episode {ep_idx} {out_key}: shape {arr.shape}, expected ({length},480,640,3)"
             raise ValueError(msg)
 
     # synthesize timestamps from frame_index for tight monotonicity
@@ -180,23 +234,19 @@ def main():
 
     ep_df = _load_episodes_meta(args.dataset_dir)
     tasks = _load_tasks(args.dataset_dir)
-    # for this dataset there is exactly one task; assert that
-    if len(tasks) != 1:
-        msg = f"expected 1 task, got {len(tasks)}: {tasks}"
-        raise ValueError(msg)
-    task_text = next(iter(tasks.values()))
+    print(f"loaded {len(tasks)} task(s): {tasks}")
 
     if args.episodes is not None:
         ep_df = ep_df[ep_df["episode_index"].isin(args.episodes)].reset_index(drop=True)
 
     rows = [r for _, r in ep_df.iterrows()]
     fn = partial(
-        _convert,
+        _convert_safe,
         dataset_dir=args.dataset_dir,
         out_dir=args.output_dir,
         fps=args.fps,
         overwrite=args.overwrite,
-        task_text=task_text,
+        tasks=tasks,
     )
     if args.num_workers <= 1:
         for r in tqdm.tqdm(rows, desc="bi_yams -> zarr"):

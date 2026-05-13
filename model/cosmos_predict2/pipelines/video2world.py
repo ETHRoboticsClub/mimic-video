@@ -366,6 +366,16 @@ class Video2WorldPipeline(BasePipeline):
             # Actual state_dict should be loaded after the pipe is created.
             pipe.dit_ema_worker.copy_to(src_model=pipe.dit, tgt_model=pipe.dit_ema)
 
+        for m in pipe.dit.modules():
+            for name, param in list(m.named_parameters(recurse=False)):
+                if param.is_meta:
+                    m._parameters[name] = torch.nn.Parameter(
+                        torch.zeros(param.shape, device=device, dtype=torch_dtype),
+                        requires_grad=param.requires_grad,
+                    )
+            for name, buf in list(m.named_buffers(recurse=False)):
+                if buf is not None and buf.is_meta:
+                    m._buffers[name] = torch.zeros(buf.shape, device=device, dtype=torch_dtype)
         pipe.dit = pipe.dit.to(device=device, dtype=torch_dtype)
         torch.cuda.empty_cache()
 

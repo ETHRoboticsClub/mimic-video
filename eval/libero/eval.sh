@@ -1,11 +1,14 @@
-GPUS=(0 1 2 3 4 5 6 7)
+# sm_120 (5090) workaround: source CUDA_HOME / LD_LIBRARY_PATH for transformer_engine
+. /home/ethrc/Desktop/mimic-video/model/scripts/env_setup.sh
+
+GPUS=(0)
 
 fifo="/tmp/gpuq.$$"
 mkfifo "$fifo"
 exec 3<>"$fifo"
 rm -f "$fifo"
 
-for i in $(seq 0 $(( 2 * ${#GPUS[@]} - 1 ))); do
+for i in $(seq 0 $(( 1 * ${#GPUS[@]} - 1 ))); do
   g=$((i % ${#GPUS[@]}))
   echo "$g" >&3
 done
@@ -26,7 +29,7 @@ launch() {
   ) &
 }
 
-checkpoint_dir=...
+checkpoint_dir=/home/ethrc/Desktop/mimic-video/model/checkpoints
 
 declare -A goal_half=(
   [img_h]=5
@@ -121,10 +124,10 @@ declare -A spatial_one=(
   [suite]=libero_spatial
 )
 
-models=(goal_half goal_tenth goal_one object_full object_half object_tenth object_one spatial_full spatial_tenth spatial_one)
+models=(object_full)
 
 execute_actions=(5)
-stop_steps=(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35)
+stop_steps=(0)
 
 for execute_steps in "${execute_actions[@]}"; do
   for stop_after in "${stop_steps[@]}"; do
