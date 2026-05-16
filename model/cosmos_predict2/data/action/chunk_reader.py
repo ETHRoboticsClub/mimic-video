@@ -244,7 +244,23 @@ class ChunkReader:
             else:
                 indices = get_closest_indices(actual_timestamps, requested_timestamps)
             start_offset = indices.min()
-            values = root[key][start_idx + start_offset : start_idx + indices.max() + 1][indices - start_offset]
+            # PATCH (Tommaso 2026-05-11): handle out-of-bounds reads gracefully —
+            # the chunk_reader's anchor placement can request indices past the end
+            # of root[key] (esp. with should_include_padded_tails + heterogeneous
+            # zarr lengths). Clamp the slice and pad with the last valid frame
+            # instead of crashing on IndexError.
+            _key_len = root[key].shape[0]
+            _abs_start = min(start_idx + start_offset, _key_len - 1) if _key_len > 0 else 0
+            _slice_end = max(min(start_idx + indices.max() + 1, _key_len), _abs_start + 1)
+            _slice = root[key][_abs_start : _slice_end]
+            if _slice.shape[0] == 0:
+                # truly empty zarr or impossible slice — fall back to a zero array of right shape
+                tail_shape = root[key].shape[1:]
+                _slice = np.zeros((1, *tail_shape), dtype=root[key].dtype)
+            _local = indices - start_offset
+            _local = np.minimum(_local, _slice.shape[0] - 1)
+            _local = np.maximum(_local, 0)
+            values = _slice[_local]
 
         if values.ndim == 1 and values.dtype != np.object_:
             values = values[:, None]

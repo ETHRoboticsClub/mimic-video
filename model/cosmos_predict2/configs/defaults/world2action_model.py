@@ -64,6 +64,8 @@ VIDEO_MODEL_CKPT_NAMES = [
     "v2w_libero_goal_agentview_lora_rank256_lr1.778e-04_bsz32_iter_000007020_fused",
     "v2w_libero_object_agentview_lora_rank256_lr1.778e-04_bsz32_iter_000008260_fused",
     "v2w_libero_spatial_agentview_lora_rank256_lr1.778e-04_bsz32_iter_000007540_fused",
+    "v2w_libero_cosmos_unified_iter_000007000_fused",
+    "v2w_yams_unified_iter_000007000_fused",
 ]
 VIDEO_MODEL_CKPT_DIR = pathlib.Path(__file__).parents[3] / "checkpoints" / "video_backbone"
 

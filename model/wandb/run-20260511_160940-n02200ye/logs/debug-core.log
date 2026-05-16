@@ -1,0 +1,7 @@
+{"time":"2026-05-11T16:09:40.475784803Z","level":"INFO","msg":"main: starting server","port-filename":"/tmp/tmpxyl4w4ay/port-132864.txt","pid":132864,"detached":false,"idle-timeout":600000000000,"log-level":0,"disable-analytics":false,"shutdown-on-parent-exit":false,"enable-dcgm-profiling":false}
+{"time":"2026-05-11T16:09:40.476349916Z","level":"INFO","msg":"server: will exit if parent process dies","ppid":132864}
+{"time":"2026-05-11T16:09:40.4763139Z","level":"INFO","msg":"server: accepting connections","addr":{"Name":"/tmp/wandb-132864-134364-509488173/socket","Net":"unix"}}
+{"time":"2026-05-11T16:09:40.661507651Z","level":"INFO","msg":"connection: ManageConnectionData: new connection created","id":"1(@)"}
+{"time":"2026-05-11T16:09:40.6738196Z","level":"INFO","msg":"handleInformInit: received","streamId":"n02200ye","id":"1(@)"}
+{"time":"2026-05-11T16:09:40.834154134Z","level":"INFO","msg":"handleInformInit: stream started","streamId":"n02200ye","id":"1(@)"}
+{"time":"2026-05-11T16:09:46.618805975Z","level":"INFO","msg":"connection: cancelling request","id":"1(@)","requestId":"nlleft9q8xnv"}

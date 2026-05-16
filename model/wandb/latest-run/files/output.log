@@ -1,0 +1,454 @@
+[05-11 16:09:41|INFO|cosmos_predict2/callbacks/wandb_logger.py:57:_lazy_init] WandbLogger: wandb.init OK — project=vam run=w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128 url=https://wandb.ai/eth-robotics-club/vam/runs/n02200ye
+Training:   2%|▏         | 200/10000 [1:31:47<74:06:09, 27.22s/it]
+[05-11 16:10:08|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 2: Hit counter: 2/5 | Loss: 30.5384 | Time: 28.85s
+[05-11 16:10:35|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 3: Hit counter: 3/5 | Loss: 32.5648 | Time: 27.05s
+[05-11 16:11:02|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 4: Hit counter: 4/5 | Loss: 21.6255 | Time: 27.11s
+[05-11 16:11:29|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 5: Hit counter: 5/5 | Loss: 33.7423 | Time: 27.13s
+[05-11 16:20:33|CRITICAL|imaginaire/callbacks/manual_gc.py:48:every_n_impl] Garbage collection disabled
+[05-11 16:54:35|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max           Min
+cpu_mem_gb                    43.755660      44.147732     43.148479
+peak_gpu_mem_gb               72.824549      72.824549     72.824549
+peak_gpu_mem_reserved_gb      74.757812      74.816406     74.738281
+nvml_used_gpu_mem_gb          67.409973      74.582336     64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898      5.417664
+temp                          60.750000      69.000000     52.000000
+power                     136678.125000  390216.000000  89720.000000
+util                          71.250000     100.000000     16.000000
+clock                       1410.000000    1410.000000   1410.000000
+[05-11 17:39:59|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 200 : iter_speed 27.24 seconds per iteration | Loss: 15.8017
+[05-11 17:39:59|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.598357      44.157780      42.405495
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          62.625000      71.000000      55.000000
+power                     362745.875000  396236.000000  280161.000000
+util                         100.000000     100.000000     100.000000
+clock                       1346.250000    1380.000000    1320.000000
+[05-11 17:40:00|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/model/iter_000000200.pt
+[05-11 17:40:00|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.7170 seconds
+[05-11 17:40:06|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/optim/iter_000000200.pt
+[05-11 17:40:06|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 3.1397 seconds
+[05-11 17:40:06|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/scheduler/iter_000000200.pt
+[05-11 17:40:06|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0011 seconds
+[05-11 17:40:06|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/trainer/iter_000000200.pt
+[05-11 17:40:06|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0011 seconds
+[05-11 18:25:29|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 300 : iter_speed 27.30 seconds per iteration | Loss: 15.0493
+[05-11 18:25:29|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.824605      44.499157      42.440868
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          64.250000      74.000000      56.000000
+power                     369779.000000  400838.000000  329456.000000
+util                         100.000000     100.000000     100.000000
+clock                       1346.250000    1380.000000    1305.000000
+[05-11 19:10:54|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 400 : iter_speed 27.25 seconds per iteration | Loss: 13.6596
+[05-11 19:10:54|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.818285      44.520691      42.389309
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          64.500000      72.000000      57.000000
+power                     361047.125000  402743.000000  276943.000000
+util                         100.000000     100.000000     100.000000
+clock                       1323.750000    1380.000000    1275.000000
+[05-11 19:10:55|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/model/iter_000000400.pt
+[05-11 19:10:55|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.7447 seconds
+[05-11 19:11:01|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/optim/iter_000000400.pt
+[05-11 19:11:01|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 2.9741 seconds
+[05-11 19:11:01|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/scheduler/iter_000000400.pt
+[05-11 19:11:01|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0010 seconds
+[05-11 19:11:01|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/trainer/iter_000000400.pt
+[05-11 19:11:01|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0011 seconds
+[05-11 19:56:25|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 500 : iter_speed 27.31 seconds per iteration | Loss: 8.7762
+[05-11 19:56:25|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.828632      44.561996      42.356251
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          64.125000      73.000000      56.000000
+power                     359301.375000  397232.000000  168723.000000
+util                         100.000000     100.000000     100.000000
+clock                       1335.000000    1395.000000    1290.000000
+[05-11 20:41:50|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 600 : iter_speed 27.25 seconds per iteration | Loss: 6.0690
+[05-11 20:41:50|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.844511      44.543896      42.389790
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          65.250000      75.000000      58.000000
+power                     351273.375000  390957.000000  226547.000000
+util                          99.750000     100.000000      98.000000
+clock                       1320.000000    1380.000000    1275.000000
+[05-11 20:41:52|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/model/iter_000000600.pt
+[05-11 20:41:52|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.7229 seconds
+[05-11 20:41:57|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/optim/iter_000000600.pt
+[05-11 20:41:57|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 2.8927 seconds
+[05-11 20:41:57|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/scheduler/iter_000000600.pt
+[05-11 20:41:57|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0012 seconds
+[05-11 20:41:57|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/trainer/iter_000000600.pt
+[05-11 20:41:57|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0015 seconds
+[05-11 21:27:31|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 700 : iter_speed 27.41 seconds per iteration | Loss: 5.0898
+[05-11 21:27:31|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.831142      44.553204      42.355976
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          64.125000      74.000000      55.000000
+power                     372805.500000  403334.000000  319382.000000
+util                          99.750000     100.000000      98.000000
+clock                       1335.000000    1380.000000    1290.000000
+[05-11 22:12:56|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 800 : iter_speed 27.25 seconds per iteration | Loss: 5.1673
+[05-11 22:12:56|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.843524      44.599274      42.423046
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          62.875000      69.000000      54.000000
+power                     357095.625000  395780.000000  222386.000000
+util                         100.000000     100.000000     100.000000
+clock                       1336.875000    1380.000000    1305.000000
+[05-11 22:12:58|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/model/iter_000000800.pt
+[05-11 22:12:58|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.7255 seconds
+[05-11 22:13:03|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/optim/iter_000000800.pt
+[05-11 22:13:03|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 2.8471 seconds
+[05-11 22:13:03|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/scheduler/iter_000000800.pt
+[05-11 22:13:03|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0010 seconds
+[05-11 22:13:03|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/trainer/iter_000000800.pt
+[05-11 22:13:03|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0011 seconds
+[05-11 22:58:27|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 900 : iter_speed 27.31 seconds per iteration | Loss: 4.0074
+[05-11 22:58:27|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.838363      44.503895      42.372849
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          64.625000      74.000000      56.000000
+power                     384157.875000  399836.000000  361632.000000
+util                         100.000000     100.000000     100.000000
+clock                       1320.000000    1380.000000    1290.000000
+[05-11 23:43:51|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 1000 : iter_speed 27.24 seconds per iteration | Loss: 4.1446
+[05-11 23:43:51|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.842169      44.499084      42.371895
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          64.000000      72.000000      57.000000
+power                     375661.125000  400669.000000  366830.000000
+util                         100.000000     100.000000     100.000000
+clock                       1338.750000    1380.000000    1305.000000
+[05-11 23:43:53|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/model/iter_000001000.pt
+[05-11 23:43:53|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.7231 seconds
+[05-11 23:43:58|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/optim/iter_000001000.pt
+[05-11 23:43:58|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 2.8753 seconds
+[05-11 23:43:58|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/scheduler/iter_000001000.pt
+[05-11 23:43:58|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0011 seconds
+[05-11 23:43:58|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/trainer/iter_000001000.pt
+[05-11 23:43:58|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0010 seconds
+[05-12 00:29:22|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 1100 : iter_speed 27.31 seconds per iteration | Loss: 4.4158
+[05-12 00:29:22|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.835433      44.526043      42.372841
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          65.500000      75.000000      58.000000
+power                     372952.250000  403869.000000  273259.000000
+util                          99.125000     100.000000      93.000000
+clock                       1320.000000    1365.000000    1275.000000
+[05-12 01:14:47|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 1200 : iter_speed 27.25 seconds per iteration | Loss: 2.9653
+[05-12 01:14:47|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.830749      44.512905      42.406525
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          65.125000      74.000000      57.000000
+power                     379327.750000  400838.000000  359310.000000
+util                          99.750000     100.000000      98.000000
+clock                       1321.875000    1365.000000    1275.000000
+[05-12 01:14:49|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/model/iter_000001200.pt
+[05-12 01:14:49|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.7391 seconds
+[05-12 01:14:54|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/optim/iter_000001200.pt
+[05-12 01:14:54|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 2.9174 seconds
+[05-12 01:14:54|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/scheduler/iter_000001200.pt
+[05-12 01:14:54|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0011 seconds
+[05-12 01:14:54|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/trainer/iter_000001200.pt
+[05-12 01:14:54|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0011 seconds
+[05-12 02:00:18|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 1300 : iter_speed 27.31 seconds per iteration | Loss: 4.8189
+[05-12 02:00:18|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.810474      44.554775      42.448990
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          64.625000      74.000000      57.000000
+power                     383196.000000  393205.000000  368577.000000
+util                         100.000000     100.000000     100.000000
+clock                       1312.500000    1350.000000    1290.000000
+[05-12 02:45:52|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 1400 : iter_speed 27.34 seconds per iteration | Loss: 2.0126
+[05-12 02:45:52|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.843101      44.500847      42.441120
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          62.000000      70.000000      53.000000
+power                     357893.000000  392128.000000  270874.000000
+util                         100.000000     100.000000     100.000000
+clock                       1365.000000    1380.000000    1305.000000
+[05-12 02:45:54|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/model/iter_000001400.pt
+[05-12 02:45:54|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.7360 seconds
+[05-12 02:45:59|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/optim/iter_000001400.pt
+[05-12 02:45:59|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 2.8977 seconds
+[05-12 02:45:59|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/scheduler/iter_000001400.pt
+[05-12 02:45:59|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0009 seconds
+[05-12 02:45:59|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/trainer/iter_000001400.pt
+[05-12 02:45:59|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0014 seconds
+[05-12 03:31:23|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 1500 : iter_speed 27.31 seconds per iteration | Loss: 2.7024
+[05-12 03:31:23|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.835739      44.579674      42.405308
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          62.375000      72.000000      54.000000
+power                     352270.875000  394947.000000  270256.000000
+util                          99.625000     100.000000      97.000000
+clock                       1321.875000    1380.000000    1290.000000
+[05-12 04:16:46|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 1600 : iter_speed 27.24 seconds per iteration | Loss: 2.8689
+[05-12 04:16:46|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.856195      44.513348      42.439709
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          62.750000      72.000000      54.000000
+power                     351933.125000  394018.000000  227675.000000
+util                          99.750000     100.000000      98.000000
+clock                       1333.125000    1380.000000    1290.000000
+[05-12 04:16:48|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/model/iter_000001600.pt
+[05-12 04:16:48|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.7482 seconds
+[05-12 04:16:53|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/optim/iter_000001600.pt
+[05-12 04:16:53|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 2.9391 seconds
+[05-12 04:16:53|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/scheduler/iter_000001600.pt
+[05-12 04:16:53|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0023 seconds
+[05-12 04:16:53|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/trainer/iter_000001600.pt
+[05-12 04:16:53|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0014 seconds
+[05-12 05:02:16|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 1700 : iter_speed 27.30 seconds per iteration | Loss: 1.7013
+[05-12 05:02:16|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    44.147450      44.749199      43.195942
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          63.625000      74.000000      55.000000
+power                     368488.125000  405190.000000  316445.000000
+util                         100.000000     100.000000     100.000000
+clock                       1351.875000    1380.000000    1320.000000
+[05-12 05:47:38|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 1800 : iter_speed 27.22 seconds per iteration | Loss: 1.2416
+[05-12 05:47:38|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.843328      44.510796      42.439529
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          63.125000      73.000000      55.000000
+power                     383725.375000  397849.000000  362415.000000
+util                          99.750000     100.000000      98.000000
+clock                       1340.625000    1395.000000    1290.000000
+[05-12 05:47:40|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/model/iter_000001800.pt
+[05-12 05:47:40|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.7400 seconds
+[05-12 05:47:45|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/optim/iter_000001800.pt
+[05-12 05:47:45|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 2.9258 seconds
+[05-12 05:47:45|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/scheduler/iter_000001800.pt
+[05-12 05:47:45|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0011 seconds
+[05-12 05:47:45|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/trainer/iter_000001800.pt
+[05-12 05:47:45|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0009 seconds
+[05-12 06:33:07|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 1900 : iter_speed 27.29 seconds per iteration | Loss: 2.9275
+[05-12 06:33:07|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.874284      44.586884      42.474648
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          62.750000      73.000000      56.000000
+power                     346809.125000  408942.000000  158823.000000
+util                          99.750000     100.000000      98.000000
+clock                       1331.250000    1380.000000    1275.000000
+[05-12 07:18:29|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 2000 : iter_speed 27.22 seconds per iteration | Loss: 1.5083
+[05-12 07:18:29|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.851979      44.609371      42.439964
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          61.875000      70.000000      55.000000
+power                     387624.750000  398307.000000  361879.000000
+util                         100.000000     100.000000     100.000000
+clock                       1331.250000    1365.000000    1305.000000
+[05-12 07:18:31|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/model/iter_000002000.pt
+[05-12 07:18:31|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.7327 seconds
+[05-12 07:18:36|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/optim/iter_000002000.pt
+[05-12 07:18:36|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 2.9540 seconds
+[05-12 07:18:36|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/scheduler/iter_000002000.pt
+[05-12 07:18:36|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0009 seconds
+[05-12 07:18:36|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/trainer/iter_000002000.pt
+[05-12 07:18:36|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0013 seconds
+[05-12 08:04:06|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 2100 : iter_speed 27.37 seconds per iteration | Loss: 2.5956
+[05-12 08:04:06|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.845793      44.562054      42.396481
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          62.125000      71.000000      56.000000
+power                     383358.500000  397474.000000  369707.000000
+util                          99.750000     100.000000      98.000000
+clock                       1323.750000    1380.000000    1290.000000
+[05-12 08:49:28|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 2200 : iter_speed 27.22 seconds per iteration | Loss: 1.5994
+[05-12 08:49:28|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.835360      44.575592      42.380051
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          62.875000      69.000000      56.000000
+power                     370756.625000  403869.000000  277735.000000
+util                         100.000000     100.000000     100.000000
+clock                       1323.750000    1365.000000    1275.000000
+[05-12 08:49:30|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/model/iter_000002200.pt
+[05-12 08:49:30|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.7517 seconds
+[05-12 08:49:35|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/optim/iter_000002200.pt
+[05-12 08:49:35|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 2.9970 seconds
+[05-12 08:49:35|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/scheduler/iter_000002200.pt
+[05-12 08:49:35|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0009 seconds
+[05-12 08:49:35|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/trainer/iter_000002200.pt
+[05-12 08:49:35|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0010 seconds
+[05-12 09:34:56|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 2300 : iter_speed 27.28 seconds per iteration | Loss: 2.4682
+[05-12 09:34:56|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.852420      44.603764      42.413651
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          62.500000      72.000000      55.000000
+power                     350833.875000  394403.000000  131638.000000
+util                         100.000000     100.000000     100.000000
+clock                       1327.500000    1380.000000    1275.000000
+[05-12 10:20:18|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 2400 : iter_speed 27.22 seconds per iteration | Loss: 2.4912
+[05-12 10:20:18|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.820125      44.560555      42.413189
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          62.750000      71.000000      54.000000
+power                     298659.375000  403207.000000  149488.000000
+util                         100.000000     100.000000     100.000000
+clock                       1346.250000    1380.000000    1290.000000
+[05-12 10:20:20|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/model/iter_000002400.pt
+[05-12 10:20:20|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.7259 seconds
+[05-12 10:20:25|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/optim/iter_000002400.pt
+[05-12 10:20:25|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 2.8592 seconds
+[05-12 10:20:25|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/scheduler/iter_000002400.pt
+[05-12 10:20:25|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0010 seconds
+[05-12 10:20:25|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/trainer/iter_000002400.pt
+[05-12 10:20:25|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0012 seconds
+[05-12 11:05:47|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 2500 : iter_speed 27.28 seconds per iteration | Loss: 2.1196
+[05-12 11:05:47|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.831546      44.543659      42.448803
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          64.000000      73.000000      56.000000
+power                     372087.250000  383510.000000  355061.000000
+util                         100.000000     100.000000     100.000000
+clock                       1329.375000    1395.000000    1290.000000
+[05-12 11:51:10|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 2600 : iter_speed 27.23 seconds per iteration | Loss: 1.4400
+[05-12 11:51:10|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.833267      44.565502      42.413696
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          63.875000      71.000000      56.000000
+power                     375044.500000  405314.000000  304691.000000
+util                         100.000000     100.000000     100.000000
+clock                       1312.500000    1365.000000    1275.000000
+[05-12 11:51:12|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/model/iter_000002600.pt
+[05-12 11:51:12|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.7595 seconds
+[05-12 11:51:17|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/optim/iter_000002600.pt
+[05-12 11:51:17|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 2.9910 seconds
+[05-12 11:51:17|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/scheduler/iter_000002600.pt
+[05-12 11:51:17|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0010 seconds
+[05-12 11:51:17|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/trainer/iter_000002600.pt
+[05-12 11:51:17|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0013 seconds
+[05-12 12:36:39|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 2700 : iter_speed 27.29 seconds per iteration | Loss: 1.9127
+[05-12 12:36:39|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.862692      44.569542      42.379272
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          63.750000      73.000000      57.000000
+power                     365053.625000  399308.000000  274099.000000
+util                         100.000000     100.000000     100.000000
+clock                       1321.875000    1365.000000    1290.000000
+[05-12 13:22:12|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 2800 : iter_speed 27.33 seconds per iteration | Loss: 1.7995
+[05-12 13:22:12|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    43.841341      44.548092      42.380165
+peak_gpu_mem_gb               57.851790      57.851790      57.851790
+peak_gpu_mem_reserved_gb      63.075684      70.142578      60.574219
+nvml_used_gpu_mem_gb          67.409973      74.582336      64.592102
+nvml_free_gpu_mem_gb          12.590027      15.407898       5.417664
+temp                          63.125000      71.000000      55.000000
+power                     341265.125000  401673.000000  178989.000000
+util                          99.750000     100.000000      98.000000
+clock                       1350.000000    1395.000000    1290.000000
+[05-12 13:22:14|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/model/iter_000002800.pt
+[05-12 13:22:14|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.7253 seconds
+[05-12 13:22:19|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/optim/iter_000002800.pt
+[05-12 13:22:19|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 2.8325 seconds
+[05-12 13:22:19|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/scheduler/iter_000002800.pt
+[05-12 13:22:19|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0013 seconds
+[05-12 13:22:19|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128/checkpoints/trainer/iter_000002800.pt
+[05-12 13:22:19|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0014 seconds
