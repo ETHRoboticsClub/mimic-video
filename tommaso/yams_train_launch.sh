@@ -38,7 +38,7 @@ mkdir -p $LOGDIR
 #  8 GPUs * micro=8 = bsz=64 global, grad_accum=2 -> effective bsz=128
 #  micro=16 would overflow on 80 GB cards (~80 GB used)
 #  save_iter=200 -> first usable checkpoint at iter 200 (~90 min after launch)
-torchrun --nproc_per_node=8 --master_port=12360 \
+torchrun --nproc_per_node=4 --master_port=12360 \
   -m scripts.train --config=cosmos_predict2/configs/config.py \
   -- experiment=$EXP \
   trainer.max_iter=10000 \
