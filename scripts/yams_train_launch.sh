@@ -13,7 +13,7 @@
 #   bash /path/to/this/script
 set -euo pipefail
 
-cd /workspace/mimic-video/model
+cd model
 source .venv/bin/activate
 
 # --- env: cuda + nccl + dataloader + wandb ---
