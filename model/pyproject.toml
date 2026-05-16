@@ -158,21 +158,14 @@ transformer-engine = [
 ]
 torch = [
   { index = "cosmos-cu126", extra = "cu126" },
-  { index = "pytorch-cu130", extra = "cu130" },
 ]
 torchvision = [
   { index = "cosmos-cu126", extra = "cu126" },
-  { index = "pytorch-cu130", extra = "cu130" },
 ]
 
 [[tool.uv.index]]
 name = "cosmos-cu126"
 url = "https://nvidia-cosmos.github.io/cosmos-dependencies/cu126_torch260/simple"
-explicit = true
-
-[[tool.uv.index]]
-name = "pytorch-cu130"
-url = "https://download.pytorch.org/whl/cu130"
 explicit = true
 
 [tool.hatch.build.targets.sdist]
