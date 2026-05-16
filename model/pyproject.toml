@@ -75,7 +75,6 @@ dependencies = [
   "threadpoolctl==3.6.0",
   "tqdm==4.66.5",
   "transformers==4.51.3",
-  "triton==3.2.0",
   "tyro==1.0.8",
   "webdataset==0.2.111",
 ]
@@ -88,6 +87,7 @@ cu126 = [
   "torch==2.6.0",
   "torchvision==0.21.0",
   "transformer-engine==1.13",
+  "triton==3.2.0",
   # Torch dependencies
   # Dependencies determined from `uv pip install "torch==2.6.0" --index-url https://download.pytorch.org/whl/cu126`
   # Issue: https://github.com/astral-sh/uv/issues/14237
@@ -104,6 +104,15 @@ cu126 = [
   "nvidia-nccl-cu12==2.21.5",
   "nvidia-nvjitlink-cu12==12.6.85",
   "nvidia-nvtx-cu12==12.6.77",
+]
+cu130 = [
+  # Blackwell / sm_120 capable PyTorch wheels.
+  "torch==2.11.0",
+  "torchvision==0.26.0",
+  # These CUDA extensions must match the installed Torch/CUDA stack. PyPI
+  # releases may build locally if matching prebuilt wheels are unavailable.
+  "flash-attn>=2.8.3",
+  "transformer-engine[pytorch]>=2.8.0",
 ]
 
 [project.readme]
@@ -149,14 +158,21 @@ transformer-engine = [
 ]
 torch = [
   { index = "cosmos-cu126", extra = "cu126" },
+  { index = "pytorch-cu130", extra = "cu130" },
 ]
 torchvision = [
   { index = "cosmos-cu126", extra = "cu126" },
+  { index = "pytorch-cu130", extra = "cu130" },
 ]
 
 [[tool.uv.index]]
 name = "cosmos-cu126"
 url = "https://nvidia-cosmos.github.io/cosmos-dependencies/cu126_torch260/simple"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
 explicit = true
 
 [tool.hatch.build.targets.sdist]

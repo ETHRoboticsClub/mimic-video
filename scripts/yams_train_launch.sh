@@ -30,7 +30,7 @@ export WANDB_TAGS=bi_yams,real_robot,ethrc_yams_backbone,aws_8xa100_80gb,fs26_bo
 
 EXP=w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128
 export WANDB_RUN_NAME=$EXP
-LOGDIR=checkpoints/vam/bi_yams/$EXP
+LOGDIR=/checkpoints/vam/bi_yams/$EXP
 mkdir -p $LOGDIR
 # rm -rf $LOGDIR/checkpoints   # uncomment for a fully-clean start; otherwise resumes
 
@@ -46,6 +46,7 @@ torchrun --nproc_per_node=4 --master_port=12360 \
   trainer.logging_iter=100 \
   trainer.grad_accum_iter=2 \
   checkpoint.save_iter=200 \
+  optimizer=adamw \
   dataloader_train.batch_size=8 \
   dataloader_train.num_workers=4 \
   dataloader_train.prefetch_factor=2 \
