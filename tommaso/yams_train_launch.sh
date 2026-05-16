@@ -42,7 +42,7 @@ torchrun --nproc_per_node=8 --master_port=12360 \
   -m scripts.train --config=cosmos_predict2/configs/config.py \
   -- experiment=$EXP \
   trainer.max_iter=10000 \
-  trainer.run_validation=False \
+  trainer.run_validation=True \
   trainer.logging_iter=100 \
   trainer.grad_accum_iter=2 \
   checkpoint.save_iter=200 \
