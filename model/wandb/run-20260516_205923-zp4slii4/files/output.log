@@ -1,0 +1,7 @@
+[05-16 20:59:24|INFO|cosmos_predict2/callbacks/wandb_logger.py:57:_lazy_init] WandbLogger: wandb.init OK — project=idm run=w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128 url=https://wandb.ai/eth-robotics-club/idm/runs/zp4slii4
+Training:   1%|          | 82/10000 [26:49<52:54:33, 19.20s/it]
+[05-16 20:59:43|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 2: Hit counter: 2/5 | Loss: 20.8184 | Time: 20.30s
+[05-16 21:00:02|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 3: Hit counter: 3/5 | Loss: 19.5336 | Time: 19.15s
+[05-16 21:00:21|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 4: Hit counter: 4/5 | Loss: 18.0402 | Time: 19.18s
+[05-16 21:00:40|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 5: Hit counter: 5/5 | Loss: 21.6879 | Time: 19.19s
+[05-16 21:07:04|CRITICAL|imaginaire/callbacks/manual_gc.py:48:every_n_impl] Garbage collection disabled

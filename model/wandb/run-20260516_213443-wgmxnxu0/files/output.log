@@ -1,0 +1,203 @@
+[05-16 21:34:44|INFO|cosmos_predict2/callbacks/wandb_logger.py:57:_lazy_init] WandbLogger: wandb.init OK — project=idm run=16may_run url=https://wandb.ai/eth-robotics-club/idm/runs/wgmxnxu0
+Training:   1%|          | 100/10000 [32:33<52:45:40, 19.19s/it]/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+[05-16 21:35:03|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 2: Hit counter: 2/5 | Loss: 20.8184 | Time: 20.31s
+[05-16 21:35:22|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 3: Hit counter: 3/5 | Loss: 19.5336 | Time: 19.15s
+[05-16 21:35:41|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 4: Hit counter: 4/5 | Loss: 18.0402 | Time: 19.17s
+[05-16 21:36:00|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 5: Hit counter: 5/5 | Loss: 21.6879 | Time: 19.18s
+[05-16 21:42:25|CRITICAL|imaginaire/callbacks/manual_gc.py:48:every_n_impl] Garbage collection disabled
+  return func(*args, **kwargs)
+[05-16 22:06:24|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    30.600500      40.716282      27.209587
+peak_gpu_mem_gb               54.071434      54.071434      54.071434
+peak_gpu_mem_reserved_gb      61.263672      61.263672      61.263672
+nvml_used_gpu_mem_gb          63.135437      63.182312      63.088562
+nvml_free_gpu_mem_gb          32.457336      32.504211      32.410461
+temp                          65.500000      66.000000      65.000000
+power                     543725.000000  570830.000000  529449.000000
+util                          99.500000     100.000000      99.000000
+clock                       2405.500000    2422.000000    2385.000000
+/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+Training:   2%|▏         | 200/10000 [1:04:33<52:16:51, 19.21s/it]/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+[05-16 22:38:24|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 200 : iter_speed 19.20 seconds per iteration | Loss: 21.1614
+[05-16 22:38:24|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    30.129199      38.931057      27.159111
+peak_gpu_mem_gb               50.272576      50.272576      50.272576
+peak_gpu_mem_reserved_gb      61.263672      61.263672      61.263672
+nvml_used_gpu_mem_gb          63.135437      63.182312      63.088562
+nvml_free_gpu_mem_gb          32.457336      32.504211      32.410461
+temp                          66.000000      67.000000      65.000000
+power                     548882.000000  576632.000000  533678.000000
+util                          99.000000     100.000000      97.000000
+clock                       2405.500000    2415.000000    2392.000000
+  return func(*args, **kwargs)
+[05-16 22:38:24|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/16may_run/checkpoints/model/iter_000000200.pt
+[05-16 22:38:24|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0941 seconds
+[05-16 22:38:25|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/16may_run/checkpoints/optim/iter_000000200.pt
+[05-16 22:38:25|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.1825 seconds
+[05-16 22:38:25|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/16may_run/checkpoints/scheduler/iter_000000200.pt
+[05-16 22:38:25|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0008 seconds
+[05-16 22:38:25|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/16may_run/checkpoints/trainer/iter_000000200.pt
+[05-16 22:38:25|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0009 seconds
+Training:   3%|▎         | 300/10000 [1:36:34<51:42:36, 19.19s/it]/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+[05-16 23:10:24|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 300 : iter_speed 19.20 seconds per iteration | Loss: 20.8593
+[05-16 23:10:24|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    30.159033      38.930935      27.124546
+peak_gpu_mem_gb               50.272576      50.272576      50.272576
+peak_gpu_mem_reserved_gb      61.263672      61.263672      61.263672
+nvml_used_gpu_mem_gb          63.135437      63.182312      63.088562
+nvml_free_gpu_mem_gb          32.457336      32.504211      32.410461
+temp                          65.500000      67.000000      64.000000
+power                     549520.000000  558578.000000  541108.000000
+util                          99.250000     100.000000      98.000000
+clock                       2398.000000    2415.000000    2370.000000
+  return func(*args, **kwargs)
+Training:   4%|▍         | 400/10000 [2:08:33<51:10:21, 19.19s/it]/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+[05-16 23:42:23|INFO|cosmos_predict2/callbacks/iter_speed.py:80:every_n_impl] 400 : iter_speed 19.19 seconds per iteration | Loss: 19.0441
+[05-16 23:42:23|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    30.176223      38.930950      27.212086
+peak_gpu_mem_gb               50.272576      50.272576      50.272576
+peak_gpu_mem_reserved_gb      61.263672      61.263672      61.263672
+nvml_used_gpu_mem_gb          63.135437      63.182312      63.088562
+nvml_free_gpu_mem_gb          32.457336      32.504211      32.410461
+temp                          65.750000      67.000000      65.000000
+power                     545577.500000  564013.000000  531268.000000
+util                          99.000000      99.000000      99.000000
+clock                       2403.500000    2422.000000    2385.000000
+  return func(*args, **kwargs)
+[05-16 23:42:24|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/16may_run/checkpoints/model/iter_000000400.pt
+[05-16 23:42:24|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0951 seconds
+[05-16 23:42:24|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/16may_run/checkpoints/optim/iter_000000400.pt
+[05-16 23:42:24|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.1838 seconds
+[05-16 23:42:24|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/16may_run/checkpoints/scheduler/iter_000000400.pt
+[05-16 23:42:24|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0008 seconds
+[05-16 23:42:24|SUCCESS|cosmos_predict2/checkpointer.py:139:_save_worker_local] Saved checkpoint (local): checkpoints/vam/bi_yams/16may_run/checkpoints/trainer/iter_000000400.pt
+[05-16 23:42:24|INFO|imaginaire/utils/misc.py:266:wrapper] Time spent on checkpoint saving (local): 0.0010 seconds
+Training:   5%|▍         | 452/10000 [2:25:12<50:53:44, 19.19s/it]Traceback (most recent call last):
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/mimic-video/model/scripts/train.py", line 84, in <module>
+    launch(config, args)
+  File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/loguru/_logger.py", line 1297, in catch_wrapper
+    return function(*args, **kwargs)
+  File "/home/ubuntu/mimic-video/model/scripts/train.py", line 47, in launch
+    trainer.train(model, dataloader_train, dataloader_val_cfg)
+  File "/home/ubuntu/mimic-video/model/imaginaire/trainer.py", line 234, in train
+    output_batch, loss, grad_accum_iter = self.training_step(
+  File "/home/ubuntu/mimic-video/model/imaginaire/trainer.py", line 330, in training_step
+    output_batch, loss = model_ddp.training_step(data, iteration)
+  File "/home/ubuntu/mimic-video/model/imaginaire/utils/distributed.py", line 260, in training_step
+    return self(*args, **kwargs)
+  File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/parallel/distributed.py", line 1832, in forward
+    else self._run_ddp_forward(*inputs, **kwargs)
+  File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/parallel/distributed.py", line 1657, in _run_ddp_forward
+    return self.module(*inputs, **kwargs)  # type: ignore[index]
+  File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/ubuntu/mimic-video/model/imaginaire/utils/distributed.py", line 254, in wrapped_training_step
+    return self.module.training_step(*_args, **_kwargs)
+  File "/home/ubuntu/mimic-video/model/cosmos_predict2/models/world2action_model.py", line 398, in training_step
+    crossattn_emb, video_sigma_B_1 = self.get_crossattn_emb(data_batch)
+  File "/home/ubuntu/mimic-video/model/cosmos_predict2/models/world2action_model.py", line 339, in get_crossattn_emb
+    _, video_B_C_T_H_W, condition = self.video2world_pipe.get_mimic_data_and_condition(data_batch)
+  File "/home/ubuntu/mimic-video/model/cosmos_predict2/pipelines/video2world.py", line 599, in get_mimic_data_and_condition
+    latent_state = self.encode(raw_state).contiguous().float()
+  File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/ubuntu/mimic-video/model/cosmos_predict2/pipelines/video2world.py", line 546, in encode
+    encoded = self.tokenizer.encode(state) * self.sigma_data
+  File "/home/ubuntu/mimic-video/model/cosmos_predict2/tokenizers/tokenizer.py", line 1082, in encode
+    latents = self.model.encode(state)
+  File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/ubuntu/mimic-video/model/cosmos_predict2/tokenizers/tokenizer.py", line 805, in encode
+    latent = self.model.encode(videos, self.scale)
+  File "/home/ubuntu/mimic-video/model/cosmos_predict2/tokenizers/tokenizer.py", line 557, in encode
+    out_ = self.encoder(
+  File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/ubuntu/mimic-video/model/cosmos_predict2/tokenizers/tokenizer.py", line 338, in forward
+    x = layer(x, feat_cache, feat_idx)
+  File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/ubuntu/mimic-video/model/cosmos_predict2/tokenizers/tokenizer.py", line 202, in forward
+    cache_x = x[:, :, -CACHE_T:, :, :].clone()
+KeyboardInterrupt
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/home/ubuntu/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+[rank0]:     return _run_code(code, main_globals, None,
+[rank0]:   File "/home/ubuntu/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/runpy.py", line 86, in _run_code
+[rank0]:     exec(code, run_globals)
+[rank0]:   File "/home/ubuntu/mimic-video/model/scripts/train.py", line 84, in <module>
+[rank0]:     launch(config, args)
+[rank0]:   File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/loguru/_logger.py", line 1297, in catch_wrapper
+[rank0]:     return function(*args, **kwargs)
+[rank0]:   File "/home/ubuntu/mimic-video/model/scripts/train.py", line 47, in launch
+[rank0]:     trainer.train(model, dataloader_train, dataloader_val_cfg)
+[rank0]:   File "/home/ubuntu/mimic-video/model/imaginaire/trainer.py", line 234, in train
+[rank0]:     output_batch, loss, grad_accum_iter = self.training_step(
+[rank0]:   File "/home/ubuntu/mimic-video/model/imaginaire/trainer.py", line 330, in training_step
+[rank0]:     output_batch, loss = model_ddp.training_step(data, iteration)
+[rank0]:   File "/home/ubuntu/mimic-video/model/imaginaire/utils/distributed.py", line 260, in training_step
+[rank0]:     return self(*args, **kwargs)
+[rank0]:   File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/parallel/distributed.py", line 1832, in forward
+[rank0]:     else self._run_ddp_forward(*inputs, **kwargs)
+[rank0]:   File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/parallel/distributed.py", line 1657, in _run_ddp_forward
+[rank0]:     return self.module(*inputs, **kwargs)  # type: ignore[index]
+[rank0]:   File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/home/ubuntu/mimic-video/model/imaginaire/utils/distributed.py", line 254, in wrapped_training_step
+[rank0]:     return self.module.training_step(*_args, **_kwargs)
+[rank0]:   File "/home/ubuntu/mimic-video/model/cosmos_predict2/models/world2action_model.py", line 398, in training_step
+[rank0]:     crossattn_emb, video_sigma_B_1 = self.get_crossattn_emb(data_batch)
+[rank0]:   File "/home/ubuntu/mimic-video/model/cosmos_predict2/models/world2action_model.py", line 339, in get_crossattn_emb
+[rank0]:     _, video_B_C_T_H_W, condition = self.video2world_pipe.get_mimic_data_and_condition(data_batch)
+[rank0]:   File "/home/ubuntu/mimic-video/model/cosmos_predict2/pipelines/video2world.py", line 599, in get_mimic_data_and_condition
+[rank0]:     latent_state = self.encode(raw_state).contiguous().float()
+[rank0]:   File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+[rank0]:     return func(*args, **kwargs)
+[rank0]:   File "/home/ubuntu/mimic-video/model/cosmos_predict2/pipelines/video2world.py", line 546, in encode
+[rank0]:     encoded = self.tokenizer.encode(state) * self.sigma_data
+[rank0]:   File "/home/ubuntu/mimic-video/model/cosmos_predict2/tokenizers/tokenizer.py", line 1082, in encode
+[rank0]:     latents = self.model.encode(state)
+[rank0]:   File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+[rank0]:     return func(*args, **kwargs)
+[rank0]:   File "/home/ubuntu/mimic-video/model/cosmos_predict2/tokenizers/tokenizer.py", line 805, in encode
+[rank0]:     latent = self.model.encode(videos, self.scale)
+[rank0]:   File "/home/ubuntu/mimic-video/model/cosmos_predict2/tokenizers/tokenizer.py", line 557, in encode
+[rank0]:     out_ = self.encoder(
+[rank0]:   File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/home/ubuntu/mimic-video/model/cosmos_predict2/tokenizers/tokenizer.py", line 338, in forward
+[rank0]:     x = layer(x, feat_cache, feat_idx)
+[rank0]:   File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/home/ubuntu/mimic-video/model/cosmos_predict2/tokenizers/tokenizer.py", line 202, in forward
+[rank0]:     cache_x = x[:, :, -CACHE_T:, :, :].clone()
+[rank0]: KeyboardInterrupt

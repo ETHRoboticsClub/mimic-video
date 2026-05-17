@@ -1,0 +1,97 @@
+_wandb:
+    value:
+        cli_version: 0.27.0
+        e:
+            z4ko6xvsbv5b9297ftmfnqbc4oh1pihk:
+                args:
+                    - --config=cosmos_predict2/configs/config.py
+                    - --
+                    - experiment=w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128
+                    - job.name=16may_run
+                    - trainer.max_iter=10000
+                    - trainer.run_validation=True
+                    - trainer.run_initial_validation=False
+                    - trainer.validation_iter=2000
+                    - trainer.max_val_iter=12
+                    - trainer.logging_iter=100
+                    - trainer.grad_accum_iter=2
+                    - checkpoint.save_iter=200
+                    - optimizer=adamw
+                    - dataloader_train.batch_size=8
+                    - dataloader_train.num_workers=4
+                    - dataloader_train.prefetch_factor=2
+                    - optimizer.lr=1.0e-04
+                cpu_count: 48
+                cpu_count_logical: 96
+                cudaVersion: "13.2"
+                disk:
+                    /:
+                        total: "531415142400"
+                        used: "434454036480"
+                email: elias.andreoli@gmail.com
+                executable: /home/ubuntu/mimic-video/model/.venv/bin/python3
+                git:
+                    commit: 3c00b607feda40b04d1f92780226bf2fac897029
+                    remote: git@github.com:ETHRoboticsClub/mimic-video.git
+                gpu: NVIDIA RTX PRO 6000 Blackwell Server Edition
+                gpu_count: 4
+                gpu_nvidia:
+                    - architecture: Blackwell
+                      cudaCores: 24064
+                      memoryTotal: "102641958912"
+                      name: NVIDIA RTX PRO 6000 Blackwell Server Edition
+                      uuid: GPU-4775eef5-d551-262d-0f42-7db0b1c4b170
+                    - architecture: Blackwell
+                      cudaCores: 24064
+                      memoryTotal: "102641958912"
+                      name: NVIDIA RTX PRO 6000 Blackwell Server Edition
+                      uuid: GPU-df2f15f9-a363-7f6b-8f1e-292b876db53f
+                    - architecture: Blackwell
+                      cudaCores: 24064
+                      memoryTotal: "102641958912"
+                      name: NVIDIA RTX PRO 6000 Blackwell Server Edition
+                      uuid: GPU-39ddb6e9-2af3-2e81-c55f-5a835c3aa51b
+                    - architecture: Blackwell
+                      cudaCores: 24064
+                      memoryTotal: "102641958912"
+                      name: NVIDIA RTX PRO 6000 Blackwell Server Edition
+                      uuid: GPU-4113e5d5-12e1-a5a0-5d4e-e671034175fa
+                host: ip-172-31-88-26
+                memory:
+                    total: "1073246048256"
+                os: Linux-6.17.0-1013-aws-x86_64-with-glibc2.39
+                program: -m scripts.train
+                python: CPython 3.10.20
+                root: /home/ubuntu/mimic-video/model
+                startedAt: "2026-05-16T21:34:43.230209Z"
+                writerId: z4ko6xvsbv5b9297ftmfnqbc4oh1pihk
+        m: []
+        python_version: 3.10.20
+        t:
+            "1":
+                - 1
+                - 11
+                - 41
+                - 49
+                - 50
+                - 71
+                - 83
+            "2":
+                - 1
+                - 11
+                - 41
+                - 49
+                - 50
+                - 71
+                - 83
+            "3":
+                - 13
+                - 15
+                - 61
+            "4": 3.10.20
+            "5": 0.27.0
+            "6": 4.51.3
+            "10":
+                - 20
+            "12": 0.27.0
+            "13": linux-x86_64

@@ -28,10 +28,8 @@ from torch.distributed.algorithms._checkpoint.checkpoint_wrapper import (
 )
 from torch.distributed.device_mesh import DeviceMesh
 from torch.distributed.fsdp import fully_shard
-from transformer_engine.pytorch.attention import (
-    DotProductAttention,
-    apply_rotary_pos_emb,
-)
+from transformer_engine.pytorch.attention import DotProductAttention
+from transformer_engine.pytorch.attention.rope import apply_rotary_pos_emb
 
 from cosmos_predict2.networks.selective_activation_checkpoint import (
     CheckpointMode,
@@ -242,10 +240,10 @@ class Attention(nn.Module):
         self.context_dim = context_dim
 
         self.q_proj = nn.Linear(query_dim, inner_dim, bias=False)
-        self.q_norm = te.pytorch.RMSNorm(self.head_dim, eps=1e-6)
+        self.q_norm = RMSNorm(self.head_dim, eps=1e-6)
 
         self.k_proj = nn.Linear(context_dim, inner_dim, bias=False)
-        self.k_norm = te.pytorch.RMSNorm(self.head_dim, eps=1e-6)
+        self.k_norm = RMSNorm(self.head_dim, eps=1e-6)
 
         self.v_proj = nn.Linear(context_dim, inner_dim, bias=False)
         self.v_norm = nn.Identity()
@@ -483,7 +481,9 @@ class FinalLayer(nn.Module):
         out_channels: int,
         use_adaln_lora: bool = False,
         adaln_lora_dim: int = 256,
+        adaln_input_dim: int | None = None,
     ):
+        adaln_input_dim = hidden_size if adaln_input_dim is None else adaln_input_dim
         super().__init__()
         self.layer_norm = nn.LayerNorm(hidden_size, elementwise_affine=False, eps=1e-6)
         self.linear = nn.Linear(
@@ -495,10 +495,11 @@ class FinalLayer(nn.Module):
         self.n_adaln_chunks = 2
         self.use_adaln_lora = use_adaln_lora
         self.adaln_lora_dim = adaln_lora_dim
+        self.adaln_input_dim = adaln_input_dim
         if use_adaln_lora:
             self.adaln_modulation = nn.Sequential(
                 nn.SiLU(),
-                nn.Linear(hidden_size, adaln_lora_dim, bias=False),
+                nn.Linear(self.adaln_input_dim, adaln_lora_dim, bias=False),
                 nn.Linear(adaln_lora_dim, self.n_adaln_chunks * hidden_size, bias=False),
             )
         else:
@@ -513,7 +514,8 @@ class FinalLayer(nn.Module):
         std = 1.0 / math.sqrt(self.hidden_size)
         torch.nn.init.trunc_normal_(self.linear.weight, std=std, a=-3 * std, b=3 * std)
         if self.use_adaln_lora:
-            torch.nn.init.trunc_normal_(self.adaln_modulation[1].weight, std=std, a=-3 * std, b=3 * std)
+            std_adaln = 1.0 / math.sqrt(self.adaln_input_dim)
+            torch.nn.init.trunc_normal_(self.adaln_modulation[1].weight, std=std_adaln, a=-3 * std_adaln, b=3 * std_adaln)
             torch.nn.init.zeros_(self.adaln_modulation[2].weight)
         else:
             torch.nn.init.zeros_(self.adaln_modulation[1].weight)
@@ -826,9 +828,10 @@ class World2ActionDIT(nn.Module):
             out_channels=self.out_channels,
             use_adaln_lora=self.use_adaln_lora,
             adaln_lora_dim=self.adaln_lora_dim,
+            adaln_input_dim=pair_timestep_feature_rank if self.use_adaln_lora else None,
         )
 
-        self.t_embedding_norm = te.pytorch.RMSNorm(
+        self.t_embedding_norm = RMSNorm(
             pair_timestep_feature_rank if use_adaln_lora else model_channels, eps=1e-6
         )
         self.init_weights()

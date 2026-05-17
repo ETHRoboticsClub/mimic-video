@@ -1,0 +1,22 @@
+[05-16 18:00:00|INFO|cosmos_predict2/callbacks/wandb_logger.py:57:_lazy_init] WandbLogger: wandb.init OK — project=vam run=w2a_bi_yams_v2w_yams_unified_iter_000007000_fused_lr1.000e-04_layer20_bsz128 url=https://wandb.ai/eth-robotics-club/vam/runs/7oa61xvx
+Training:   1%|          | 100/10000 [04:17<6:53:03,  2.50s/it]/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+[05-16 18:00:02|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 2: Hit counter: 2/5 | Loss: 21.7237 | Time: 4.02s
+[05-16 18:00:05|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 3: Hit counter: 3/5 | Loss: 32.1128 | Time: 2.49s
+[05-16 18:00:07|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 4: Hit counter: 4/5 | Loss: 22.1631 | Time: 2.50s
+[05-16 18:00:10|INFO|cosmos_predict2/callbacks/iter_speed.py:51:on_training_step_end] Iteration 5: Hit counter: 5/5 | Loss: 20.6021 | Time: 2.49s
+[05-16 18:01:00|CRITICAL|imaginaire/callbacks/manual_gc.py:48:every_n_impl] Garbage collection disabled
+  return func(*args, **kwargs)
+[05-16 18:04:07|INFO|cosmos_predict2/callbacks/device_monitor.py:145:every_n_impl] DeviceMonitor Stats:
+                                    Avg            Max            Min
+cpu_mem_gb                    15.205537      24.677246      12.010754
+peak_gpu_mem_gb               12.289302      12.289302      12.289302
+peak_gpu_mem_reserved_gb      12.663574      12.720703      12.644531
+nvml_used_gpu_mem_gb          14.394714      14.422546      14.328796
+nvml_free_gpu_mem_gb          81.198059      81.263977      81.170227
+temp                          70.250000      74.000000      65.000000
+power                     528703.250000  539569.000000  514990.000000
+util                         100.000000     100.000000     100.000000
+clock                       2392.250000    2400.000000    2385.000000
+/home/ubuntu/mimic-video/model/.venv/lib/python3.10/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+Training:   1%|▏         | 141/10000 [06:00<6:50:58,  2.50s/it]

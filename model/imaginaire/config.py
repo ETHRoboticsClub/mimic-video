@@ -345,6 +345,8 @@ class TrainerConfig:
     logging_iter: int = 100
     # Whether we want to run the validation routines.
     run_validation: bool = True
+    # Whether to run validation before the first training iteration.
+    run_initial_validation: bool = True
     # How often we evaluate on the validation set.
     validation_iter: int = 999999999
     # Kill the process after N seconds since the last iteration (usually means dead job).
