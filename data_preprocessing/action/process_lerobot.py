@@ -219,7 +219,7 @@ def _convert(
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dataset-dir", type=pathlib.Path, required=True,
+    ap.add_argument("--dataset-path", type=pathlib.Path, required=True,
                     help="lerobot v3 dataset root (contains data/, videos/, meta/)")
     ap.add_argument("--output-dir", type=pathlib.Path, required=True,
                     help="folder to write per-episode .zarr files into")
@@ -242,7 +242,7 @@ def main():
     rows = [r for _, r in ep_df.iterrows()]
     fn = partial(
         _convert_safe,
-        dataset_dir=args.dataset_dir,
+        dataset_dir=args.dataset_path,
         out_dir=args.output_dir,
         fps=args.fps,
         overwrite=args.overwrite,

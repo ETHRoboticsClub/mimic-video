@@ -35,7 +35,7 @@ mimic-video
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 cd model
-uv sync --extra cu126
+uv sync --extra cu128
 source .venv/bin/activate
 ```
 
