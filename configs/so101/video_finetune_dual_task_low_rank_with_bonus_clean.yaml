@@ -1,0 +1,148 @@
+seed: 0 # global RNG seed for samplers and per-worker dataset RNGs
+
+preprocessing:
+  sources:
+    - repo_id: rl26-world-models/so101-task1-720p-whole-arm-trimmed
+      revision: main
+      instruction: "the robot arm gently nudges the white object towards the target circle"
+      video_feature: observation.images.front
+      exclude_episodes: []
+    - repo_id: rl26-world-models/so101-task2-720p-whole-arm-v3-cleaned-trimmed
+      revision: main
+      instruction: "the robot arm gently nudges the white object towards the target circle while avoiding the red cylinder"
+      video_feature: observation.images.front
+      exclude_episodes: []
+    - repo_id: rl26-world-models/so101-task2-720p-whole-arm-v4-fresh-trimmed
+      revision: main
+      instruction: "the robot arm gently nudges the white object towards the target circle while avoiding the red cylinder"
+      video_feature: observation.images.front
+      exclude_episodes: []
+    - repo_id: rl26-world-models/so101-task1-720p-whole-arm-cube-trimmed
+      revision: main
+      instruction: "the robot arm gently nudges the colored cube towards the target circle"
+      video_feature: observation.images.front
+      exclude_episodes: []
+    - repo_id: rl26-world-models/so101-task2-720p-whole-arm-cube-trimmed
+      revision: main
+      instruction: "the robot arm gently nudges the colored cube towards the target circle while avoiding the red cylinder"
+      video_feature: observation.images.front
+      exclude_episodes: []
+  text_encoder:
+    model_id: google-t5/t5-large
+    revision: main
+  image:
+    # Center-crop the 1280x720 (16:9) source to 960x720 (4:3) so the resize to
+    # 640x480 (4:3) preserves aspect ratio. Loses 160px on each side.
+    crop_xywh: [160, 0, 960, 720]
+    output_size_hw: [480, 640]
+  contact_sheet:
+    enabled: false
+  force: false
+
+training:
+  video_finetune:
+    enabled: true
+    experiment: so101
+    launch:
+      nproc_per_node: 4
+      dryrun: false
+      output_root: null # set via IMAGINAIRE_OUTPUT_ROOT env var (injected by the launch script)
+    job:
+      project: rl-mimic-backbone
+      group: so101
+      name: task1_2_dual_task_r64_bonus_clean
+    wandb:
+      enabled: true
+    upload:
+      hf_repo_id: null # set to "<org>/<repo>" to push LoRA adapters per save
+    video_model:
+      num_frames: 61 # 5 obs + 56 future = 61 total (must satisfy 1 + 4k)
+      obs_history: 5
+      state_t: 16 # get_latent_num_frames(61) = 1 + 60//4 = 16
+      # data_fps     = rate the cached mp4s are encoded at (preprocessor writes at SO101_FPS=10).
+      # effective_fps = rate the model is fed; sampler step = data_fps / effective_fps.
+      # Keep both at 10 unless you intentionally want to up/downsample inside the dataloader.
+      data_fps: 10.0
+      effective_fps: 10.0
+    model:
+      # Changing any LoRA shape (rank, target_modules, train_architecture)
+      # invalidates existing LoRA adapter checkpoints — resume will fail with
+      # strict_resume: true. lora_alpha is a runtime scalar and is safe to change.
+      train_architecture: lora
+      lora_rank: 64
+      lora_alpha: 32
+      lora_dropout: 0.03 # PEFT LoRA dropout for mild regularization.
+      init_lora_weights: true
+      lora_target_modules: "q_proj,k_proj,v_proj,output_proj,x_embedder.proj.1,linear_1,linear_2,mlp.layer1,mlp.layer2"
+    dataset:
+      val_ratio: 0.07 # ~3-4 episodes per source held out for validation loss monitoring
+    eval_video:
+      enabled: true
+      # Leave episode_stem/episode_index unset to generate one video per
+      # validation-split episode each validation cycle. Set
+      # max_episodes_per_val_cycle to cap how many are generated per cycle.
+      episode_stem: null
+      episode_index: null
+      max_episodes_per_val_cycle: 5
+      seed_start_frame: 50
+      num_seed_frames: 5
+      # Pixel-space generation length. Match training horizon (num_frames: 61)
+      # to avoid VRAM spikes and out-of-distribution extrapolation during eval.
+      num_eval_video_frames: 61
+      seed: 0
+      guidance: 7.0
+      num_sampling_step: 25  # was 35; faster eval, ~30% wall-clock cut, minimal quality loss
+    trainer:
+      max_iter: 10000
+      logging_iter: 100
+      validation_iter: 100 # check val loss every 100 steps
+      validate_at_epoch_end: false
+      run_validation: true
+      grad_accum_iter: 1
+      max_val_iter: 4
+      timeout_period: 999999999
+      grad_clip_norm: 1.0 # tighter clip for LoRA (was 10.0)
+    checkpoint:
+      save_iter: 100
+      save_at_epoch_end: false
+      keep_latest: 60
+      load_path: null
+      load_training_state: false  # clean restart: load weights only, reinit iter/optim/scheduler
+      only_load_scheduler_state: false
+      strict_resume: true  # iter_2800 was already trained at state_t=16 / num_frames=61, so shapes match
+      verbose: true
+      load_ema_to_reg: false
+    dataloader_train:
+      batch_size: 4  # per-rank; with nproc_per_node=4 the global batch is 16
+      num_workers: 8 # bumped from 4 for H200 throughput
+      persistent_workers: true
+      prefetch_factor: 2  # at state_t=16 each sample is 3× larger; high prefetch OOMed host during eval
+      pin_memory: true
+      drop_last: true
+      in_order: false
+    dataloader_val:
+      batch_size: 1
+      num_workers: 2
+      persistent_workers: true
+      prefetch_factor: 2
+      pin_memory: false
+      drop_last: false
+      in_order: true
+    optimizer:
+      lr: 0.0001778 # effective LoRA LR = lr * lora_alpha / lora_rank = 1.778e-4 * 32/64 = 8.89e-5
+      weight_decay: 0.2
+      betas: [0.9, 0.99]
+      eps: 0.00000001
+      master_weights: true
+      capturable: true
+    lr_scheduler:
+      # type: constant | lambdalinear | cosine. The numeric knobs below are
+      # consumed by lambdalinear and cosine; ignored for constant.
+      type: cosine
+      warm_up_steps: [500]
+      cycle_lengths: [10000] # matches trainer.max_iter for one full cosine decay
+      f_start: [1.0e-6]
+      f_max: [1.0]
+      f_min: [0.1] # decays to 10% of peak LR
+  action_decoder:
+    enabled: false

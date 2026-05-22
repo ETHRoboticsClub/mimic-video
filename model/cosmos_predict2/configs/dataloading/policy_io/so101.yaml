@@ -1,0 +1,49 @@
+img_resize_sizes: [480, 640]
+
+policy_io:
+  action:
+    workspace_rgb:
+      # 36 future video frames at 10 Hz = 3.6 s. 5 obs + 36 action = 41 =
+      # full_T for state_t=11. Inference budget knob.
+      horizon: 36
+      normalization_type: ${NormalizationType:NONE}
+      target_repr: null
+      target_frequency: 10  # match the 10 fps cosmos backbone + 10 Hz dataset
+      shift_right_by: 0.1   # one source frame at 10 Hz
+    joint_action_lowdim:
+      # 60 future actions at 30 Hz = 2.0 s lookahead (matches the original
+      # Mimic paper's native control rate). Video is still at 10 Hz; the
+      # preprocessor keeps lowdim at source rate so this requires the source
+      # dataset to be 30 Hz (or higher) for the chunk_reader to pick samples
+      # directly rather than interpolate.
+      horizon: 60
+      normalization_type: ${NormalizationType:VARIANCE}
+      target_repr: ${LieRepr:ABSOLUTE}
+      target_frequency: 30
+      shift_right_by: 0
+  obs:
+    workspace_rgb:
+      horizon: 5
+      normalization_type: ${NormalizationType:NONE}
+      target_repr: null
+      target_frequency: 10
+      shift_right_by: 0
+    joint_state_lowdim:
+      horizon: 1
+      normalization_type: ${NormalizationType:VARIANCE}
+      target_repr: ${LieRepr:ABSOLUTE}
+      target_frequency: 30  # match action rate; singleton so the rate is largely cosmetic here
+      shift_right_by: 0
+    language_embedding:
+      horizon: 1
+      normalization_type: ${NormalizationType:NONE}
+      target_repr: null
+      target_frequency: null
+      shift_right_by: 0
+
+concat_groups:
+  action/lowdim_concat:
+    - action/joint_action_lowdim
+
+  obs/lowdim_concat:
+    - obs/joint_state_lowdim

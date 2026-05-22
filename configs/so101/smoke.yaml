@@ -1,0 +1,148 @@
+preprocessing:
+  source:
+    repo_id: rl26-world-models/so101-task1-mini-v1-birdview
+    revision: main
+  text_encoder:
+    model_id: google-t5/t5-large # upgrade to T5-11B
+    revision: main
+  instruction: push the object to the right
+  video_feature: observation.images.top
+  exclude_episodes: [4]
+  image:
+    crop_xywh: [0, 0, 640, 480]
+    output_size_hw: [480, 640]
+  video:
+    target_fps: 10
+  contact_sheet:
+    enabled: true
+  force: false
+
+training:
+  video_finetune:
+    enabled: true
+    experiment: so101
+    launch:
+      nproc_per_node: 1
+      dryrun: true
+      output_root: /tmp/mimic-video-so101-smoke
+    job:
+      project: rl-mimic-backbone
+      group: so101_smoke
+      name: v2w_so101_lora_rank256_lr1.778e-04_bsz32_smoke
+    wandb:
+      enabled: true
+    video_model:
+      num_frames: 25
+      obs_history: 5
+      state_t: 7
+    trainer:
+      max_iter: 10
+      logging_iter: 1
+      validation_iter: 999999999
+      run_validation: false
+      grad_accum_iter: 1
+      max_val_iter: null
+      timeout_period: 999999999
+      grad_clip_norm: 10.0
+    checkpoint:
+      save_iter: 0
+      load_path: null
+      load_training_state: false
+      only_load_scheduler_state: false
+      strict_resume: true
+      verbose: true
+      load_ema_to_reg: false
+    dataloader_train:
+      batch_size: 1
+      num_workers: 0
+      persistent_workers: false
+      prefetch_factor: null
+      pin_memory: true
+      drop_last: true
+      in_order: false
+  action_decoder:
+    enabled: true
+    experiment: so101
+    launch:
+      nproc_per_node: 1
+      dryrun: true
+      output_root: /tmp/mimic-video-so101-smoke
+    job:
+      project: rl-mimic-idm
+      group: so101_smoke
+      name: w2a_so101_v2w_pretrained_cosmos_lr1.000e-04_layer20_bsz1_smoke
+    wandb:
+      enabled: true
+    trainer:
+      max_iter: 10
+      logging_iter: 1
+      validation_iter: 999999999
+      run_validation: false
+      grad_accum_iter: 1
+      max_val_iter: null
+      timeout_period: 999999999
+      grad_clip_norm: 10.0
+    checkpoint:
+      save_iter: 0
+      load_path: null
+      load_training_state: false
+      only_load_scheduler_state: false
+      strict_resume: true
+      verbose: true
+      load_ema_to_reg: false
+    dataloader_train:
+      batch_size: 1
+      num_workers: 0
+      persistent_workers: false
+      prefetch_factor: null
+      pin_memory: true
+      drop_last: true
+      in_order: false
+    optimizer:
+      lr: 0.0001
+      weight_decay: 0.1
+      betas: [0.9, 0.99]
+      eps: 0.00000001
+      master_weights: true
+      capturable: true
+    lr_scheduler:
+      warm_up_steps: [1000]
+      cycle_lengths: [500000]
+      f_start: [0.000001]
+      f_max: [1.0]
+      f_min: [0.2]
+    model:
+      train_architecture: base
+      lora_rank: 16
+      lora_alpha: 16
+      lora_target_modules: q_proj,k_proj,v_proj,output_proj,mlp.layer1,mlp.layer2
+      init_lora_weights: true
+      precision: bfloat16
+      loss_reduce: mean
+      loss_scale: 10.0
+      action_dit_path: ""
+      video_dit_path: null
+      xattn_layer_idx: 20
+      video_guardrail_enabled: false
+      fsdp_shard_size: 0
+    action_scheduler:
+      alpha: 1.0
+      beta: 1.0
+      num_denoising_steps: 10
+    ema:
+      enabled: false
+    network:
+      max_horizon: 61
+      in_channels: 6
+      out_channels: 6
+      model_channels: 256
+      num_blocks: 4
+      num_heads: 4
+      mlp_ratio: 4.0
+      atten_backend: flash_attn_no_cp
+      crossattn_emb_channels: 2048
+      use_adaln_lora: true
+      adaln_lora_dim: 64
+      pair_timestep_feature_rank: 256
+      sac_mode: none
+      sac_every_n_blocks: 1

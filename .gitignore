@@ -1,0 +1,15 @@
+model/checkpoints
+eval/*/results
+nohup.out
+uv.lock
+.env
+
+__pycache__/
+.venv/
+
+data
+logs/
+
+output
+checkpoints.DS_Store
+.DS_Store

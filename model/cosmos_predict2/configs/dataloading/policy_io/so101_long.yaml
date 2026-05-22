@@ -1,0 +1,49 @@
+img_resize_sizes: [480, 640]
+
+# Long-horizon variant of policy_io/so101.yaml. Sized for backbones trained at
+# state_t=16 (61 pixel frames). obs(5) + action(56) = 61 = full_T for state_t=16.
+# Lowdim streams stay at the dataset's native 30 Hz; video at 10 Hz.
+policy_io:
+  action:
+    workspace_rgb:
+      # 56 future video frames at 10 Hz = 5.6 s lookahead. Matches the cosmos
+      # backbone's training horizon at state_t=16.
+      horizon: 56
+      normalization_type: ${NormalizationType:NONE}
+      target_repr: null
+      target_frequency: 10
+      shift_right_by: 0.1
+    joint_action_lowdim:
+      # 60 future actions at 30 Hz = 2.0 s lookahead (matches original Mimic
+      # paper's native control rate).
+      horizon: 60
+      normalization_type: ${NormalizationType:VARIANCE}
+      target_repr: ${LieRepr:ABSOLUTE}
+      target_frequency: 30
+      shift_right_by: 0
+  obs:
+    workspace_rgb:
+      horizon: 5
+      normalization_type: ${NormalizationType:NONE}
+      target_repr: null
+      target_frequency: 10
+      shift_right_by: 0
+    joint_state_lowdim:
+      horizon: 1
+      normalization_type: ${NormalizationType:VARIANCE}
+      target_repr: ${LieRepr:ABSOLUTE}
+      target_frequency: 30
+      shift_right_by: 0
+    language_embedding:
+      horizon: 1
+      normalization_type: ${NormalizationType:NONE}
+      target_repr: null
+      target_frequency: null
+      shift_right_by: 0
+
+concat_groups:
+  action/lowdim_concat:
+    - action/joint_action_lowdim
+
+  obs/lowdim_concat:
+    - obs/joint_state_lowdim

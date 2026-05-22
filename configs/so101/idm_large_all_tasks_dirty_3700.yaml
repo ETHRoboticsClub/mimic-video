@@ -1,0 +1,178 @@
+# ~110M-param IDM (action decoder) training against the rank-64 cosmos "bonus"
+# backbone (configs/so101/video_finetune_dual_task_low_rank_with_bonus.yaml).
+# Preprocessing mix is 6 sources: task1, task2 v3-cleaned, task2 v4-fresh,
+# task1-cube, task2-cube, and side-to-side. Native-rate HF sources; the
+# pipeline does the 30 → 10 fps subsampling at preprocessing time. Backbone
+# is frozen and read from `video_dit_path` (currently iter_3400 fused).
+# Note: side-to-side is OOD for the bonus backbone (trained on 5 sources).
+
+seed: 0  # global RNG seed for samplers and per-worker dataset RNGs
+
+preprocessing:
+  sources:
+    - repo_id: rl26-world-models/so101-task1-720p-whole-arm-trimmed
+      revision: main
+      instruction: "the robot arm gently nudges the white object towards the target circle"
+      video_feature: observation.images.front
+      exclude_episodes: []
+    - repo_id: rl26-world-models/so101-task2-720p-whole-arm-v3-cleaned-trimmed
+      revision: main
+      instruction: "the robot arm gently nudges the white object towards the target circle while avoiding the red cylinder"
+      video_feature: observation.images.front
+      exclude_episodes: []
+    - repo_id: rl26-world-models/so101-task2-720p-whole-arm-v4-fresh-trimmed
+      revision: main
+      instruction: "the robot arm gently nudges the white object towards the target circle while avoiding the red cylinder"
+      video_feature: observation.images.front
+      exclude_episodes: []
+    - repo_id: rl26-world-models/so101-task1-720p-whole-arm-cube-trimmed
+      revision: main
+      instruction: "the robot arm gently nudges the colored cube towards the target circle"
+      video_feature: observation.images.front
+      exclude_episodes: []
+    - repo_id: rl26-world-models/so101-task2-720p-whole-arm-cube-trimmed
+      revision: main
+      instruction: "the robot arm gently nudges the colored cube towards the target circle while avoiding the red cylinder"
+      video_feature: observation.images.front
+      exclude_episodes: []
+    - repo_id: rl26-world-models/so101-720p-whole-arm-side-to-side-trimmed
+      revision: main
+      instruction: "a robotic arm moves frantically side to side"
+      video_feature: observation.images.front
+      exclude_episodes: []
+  text_encoder:
+    model_id: google-t5/t5-large
+    revision: main
+  image:
+    crop_xywh: [160, 0, 960, 720]
+    output_size_hw: [480, 640]
+  contact_sheet:
+    enabled: false
+  force: false
+
+training:
+  video_finetune:
+    enabled: false
+  action_decoder:
+    enabled: true
+    experiment: so101
+    launch:
+      nproc_per_node: 2
+      dryrun: false
+      output_root: null  # set via IMAGINAIRE_OUTPUT_ROOT env var (injected by the launch script)
+    job:
+      project: rl-mimic-idm
+      group: so101
+      name: task1_2_dual_task_r64_idm_110M_all_tasks_dirty_backbone4500
+    wandb:
+      enabled: true
+    dataset:
+      # Hash-based val split (same mechanism as cosmos video_finetune); stable
+      # per basename across the source mix.
+      val_ratio: 0.07
+    trainer:
+      max_iter: 5000
+      logging_iter: 50
+      validation_iter: 50
+      run_validation: true
+      validate_at_epoch_end: false
+      grad_accum_iter: 1
+      max_val_iter: 30
+      timeout_period: 999999999
+      grad_clip_norm: 10.0
+    checkpoint:
+      save_iter: 50
+      save_at_epoch_end: false
+      keep_latest: 15
+      load_path: null
+      load_training_state: false  # resume model weights only; rebuild optim/scheduler from scratch
+      only_load_scheduler_state: false
+      strict_resume: true
+      verbose: true
+      load_ema_to_reg: false
+    dataloader_train:
+      batch_size: 18
+      num_workers: 4
+      persistent_workers: true
+      # IDM samples are ~150 MB each (5+36 frames at state_t=11, float). Aggressive
+      # prefetch / workers easily OOMs host RAM when the cosmos backbone training is
+      # running on the same host.
+      prefetch_factor: 2
+      pin_memory: true
+      drop_last: true
+      in_order: false
+    dataloader_val:
+      batch_size: 1
+      num_workers: 2
+      persistent_workers: true
+      prefetch_factor: 2
+      pin_memory: false
+      drop_last: false
+      in_order: true
+    optimizer:
+      lr: 0.00015
+      weight_decay: 0.2
+      betas: [0.9, 0.99]
+      eps: 0.00000001
+      master_weights: true
+      capturable: true
+    lr_scheduler:
+      # Training from scratch — short warmup is fine for a fresh action decoder
+      # on a converged backbone.
+      type: cosine
+      warm_up_steps: [200]  # was 500; shorter re-warm for backbone swap
+      cycle_lengths: [5000]  # matches trainer.max_iter
+      f_start: [1.0e-6]
+      f_max: [1.0]
+      f_min: [0.2]
+    model:
+      train_architecture: base  # IDM action decoder is trained from scratch, no LoRA
+      lora_rank: 16
+      lora_alpha: 16
+      lora_target_modules: q_proj,k_proj,v_proj,output_proj,mlp.layer1,mlp.layer2
+      init_lora_weights: true
+      precision: bfloat16
+      loss_reduce: mean
+      loss_scale: 10.0
+      validation_mode: gt_video
+      # Diagnostic: proprio-shortcut failure mode was observed (loss barely
+      # changed when swapping in raw v2w_pretrained_cosmos). Cranked from 0.2
+      # to force the action decoder to lean on video cross-attention. Drop
+      # back toward 0.3 if val loss climbs unreasonably.
+      obs_dropout: 0.15
+      action_dit_path: ""
+      # iter_3700 fused cosmos backbone from the bonus run. Bump as the bonus
+      # backbone trains further; remember to also bump the corresponding
+      # video_backbone hardlink in this run's cache dir.
+      video_dit_path: /mnt/personal/korcadav/mimic-video-outputs/cosmos-lora/rl-mimic-backbone/so101/task1_2_dual_task_r64_bonus/checkpoints/model/iter_000003700_fused.pt
+      # 41-frame video context = 5 obs + 36 action = full_T for state_t=11.
+      # Mild OOD vs the bonus backbone's training trajectory (state_t=12);
+      # RoPE handles it. Chosen as a balance between context length and
+      # inference-time VRAM/latency budget.
+      video_pipe_state_t: 11
+      xattn_layer_idx: 20
+      video_guardrail_enabled: false
+      fsdp_shard_size: 0
+    action_scheduler:
+      alpha: 1.0
+      beta: 1.0
+      num_denoising_steps: 10
+    ema:
+      enabled: false
+    network:
+      max_horizon: 61
+      in_channels: 6
+      out_channels: 6
+      # ~110M params: per-block ≈ 13·c² + 3·c·crossattn_emb (self+cross+mlp);
+      # 12·(13·640² + 3·640·2048) ≈ 111M, plus embed/output/adaln-lora extras.
+      model_channels: 640
+      num_blocks: 12
+      num_heads: 10  # 640/10 = 64 per head
+      mlp_ratio: 4.0
+      atten_backend: flash_attn_no_cp
+      crossattn_emb_channels: 2048
+      use_adaln_lora: true
+      adaln_lora_dim: 64
+      pair_timestep_feature_rank: 640
+      sac_mode: none
+      sac_every_n_blocks: 1

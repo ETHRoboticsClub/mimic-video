@@ -1,0 +1,6 @@
+easydict==1.9 
+robosuite==1.4.0
+bddl==1.0.1
+gym==0.25.2
+future==1.0.0
+h5py==3.16.0

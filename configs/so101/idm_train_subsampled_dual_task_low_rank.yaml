@@ -1,0 +1,149 @@
+# IDM (action decoder) training against the rank-64 cosmos backbone trained
+# from configs/so101/video_finetune_subsampled_dual_task_low_rank.yaml.
+# Same preprocessing mix (task1 + task2 v3-cleaned + task2 v4-fresh); the
+# backbone is frozen and read from `video_dit_path`.
+
+seed: 0  # global RNG seed for samplers and per-worker dataset RNGs
+
+preprocessing:
+  sources:
+    - repo_id: rl26-world-models/so101-task1-720p-whole-arm-trimmed-subsampled-10fps
+      revision: main
+      instruction: "the robot arm gently nudges the white object towards the target circle"
+      video_feature: observation.images.front
+      exclude_episodes: []
+    - repo_id: rl26-world-models/so101-task2-720p-whole-arm-v3-cleaned-trimmed-subsampled-10fps
+      revision: main
+      instruction: "the robot arm gently nudges the white object towards the target circle while avoiding the red cylinder"
+      video_feature: observation.images.front
+      exclude_episodes: []
+    - repo_id: rl26-world-models/so101-task2-720p-whole-arm-v4-fresh-trimmed-subsampled-10fps
+      revision: main
+      instruction: "the robot arm gently nudges the white object towards the target circle while avoiding the red cylinder"
+      video_feature: observation.images.front
+      exclude_episodes: []
+  text_encoder:
+    model_id: google-t5/t5-large
+    revision: main
+  image:
+    crop_xywh: [160, 0, 960, 720]
+    output_size_hw: [480, 640]
+  contact_sheet:
+    enabled: false
+  force: false
+
+training:
+  video_finetune:
+    enabled: false
+  action_decoder:
+    enabled: true
+    experiment: so101
+    launch:
+      nproc_per_node: 2
+      dryrun: false
+      output_root: null  # set via IMAGINAIRE_OUTPUT_ROOT env var (injected by the launch script)
+    job:
+      project: rl-mimic-idm
+      group: so101
+      name: task1_2_subsampled_true_10fps_r64_idm
+    wandb:
+      enabled: true
+    dataset:
+      # Hash-based val split (same mechanism as cosmos video_finetune); stable
+      # per basename across the source mix.
+      val_ratio: 0.07
+    trainer:
+      max_iter: 5000
+      logging_iter: 50
+      validation_iter: 50
+      run_validation: true
+      validate_at_epoch_end: false
+      grad_accum_iter: 1
+      max_val_iter: 30
+      timeout_period: 999999999
+      grad_clip_norm: 10.0
+    checkpoint:
+      save_iter: 50
+      save_at_epoch_end: false
+      keep_latest: 15
+      load_path: null
+      load_training_state: false  # resume model weights only; rebuild optim/scheduler from scratch
+      only_load_scheduler_state: false
+      strict_resume: true
+      verbose: true
+      load_ema_to_reg: false
+    dataloader_train:
+      batch_size: 16
+      num_workers: 4
+      persistent_workers: true
+      # IDM samples are ~225 MB each (5+56 frames, float). Aggressive prefetch
+      # / workers easily OOMs when the cosmos backbone training is running on
+      # the same host. Settings below give ~14 GB per rank.
+      prefetch_factor: 2
+      pin_memory: true
+      drop_last: true
+      in_order: false
+    dataloader_val:
+      batch_size: 1
+      num_workers: 2
+      persistent_workers: true
+      prefetch_factor: 2
+      pin_memory: false
+      drop_last: false
+      in_order: true
+    optimizer:
+      lr: 0.0001
+      weight_decay: 0.1
+      betas: [0.9, 0.99]
+      eps: 0.00000001
+      master_weights: true
+      capturable: true
+    lr_scheduler:
+      # IDM trains a fresh action decoder from scratch; cosine over the full run.
+      type: cosine
+      warm_up_steps: [500]
+      cycle_lengths: [5000]  # matches trainer.max_iter
+      f_start: [1.0e-6]
+      f_max: [1.0]
+      f_min: [0.2]
+    model:
+      train_architecture: base  # IDM action decoder is trained from scratch, no LoRA
+      lora_rank: 16
+      lora_alpha: 16
+      lora_target_modules: q_proj,k_proj,v_proj,output_proj,mlp.layer1,mlp.layer2
+      init_lora_weights: true
+      precision: bfloat16
+      loss_reduce: mean
+      loss_scale: 10.0
+      validation_mode: gt_video
+      action_dit_path: ""
+      video_dit_path: /mnt/personal/korcadav/mimic-video-outputs/cosmos-lora/rl-mimic-backbone/so101/task1_2_subsampled_true_10fps_r64/checkpoints/model/iter_000002400_fused.pt
+      # 41-frame video context = 5 obs + 36 action = full_T for state_t=11.
+      # Mild OOD vs the backbone's training trajectory (state_t was 8 → 10 → 16);
+      # RoPE handles it. Chosen as a balance between context length and
+      # inference-time VRAM/latency budget.
+      video_pipe_state_t: 11
+      xattn_layer_idx: 20
+      video_guardrail_enabled: false
+      fsdp_shard_size: 0
+    action_scheduler:
+      alpha: 1.0
+      beta: 1.0
+      num_denoising_steps: 10
+    ema:
+      enabled: false
+    network:
+      max_horizon: 61
+      in_channels: 6
+      out_channels: 6
+      model_channels: 256
+      num_blocks: 4
+      num_heads: 4
+      mlp_ratio: 4.0
+      atten_backend: flash_attn_no_cp
+      crossattn_emb_channels: 2048
+      use_adaln_lora: true
+      adaln_lora_dim: 64
+      pair_timestep_feature_rank: 256
+      sac_mode: none
+      sac_every_n_blocks: 1

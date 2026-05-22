@@ -1,0 +1,111 @@
+preprocessing:
+  sources:
+    - repo_id: rl26-world-models/so101-task1-720p-whole-arm-trimmed
+      revision: main
+      instruction: "the robot arm gently nudges the white object towards the target circle"
+      video_feature: observation.images.front
+      exclude_episodes: []
+    - repo_id: rl26-world-models/so101-task2-720p-whole-arm-trimmed
+      revision: main
+      instruction: "the robot arm gently nudges the white object towards the target circle while avoiding the red cylinder"
+      video_feature: observation.images.front
+      exclude_episodes: []
+  text_encoder:
+    model_id: google-t5/t5-large # upgrade to T5-11B
+    revision: main
+  max_episodes: 200
+  image:
+    crop_xywh: [0, 0, 1280, 720]
+    output_size_hw: [480, 640]
+    letterbox: true
+    mask_regions: []  # list of [x, y, w, h] regions to black out in output space
+  video:
+    target_fps: 10
+  contact_sheet:
+    enabled: false
+  trim: 
+    enabled: false
+    threshold: 0.5        # L2 norm dist from start rest baseline (observation.state) to count as active
+    grace_frames: 15      # frames to keep before active region (0.5s at 30fps)
+    ref_frames: 15        # frames at start used to compute rest baseline
+    min_frames: 20        # drop episode entirely if fewer frames remain after trim
+    trim_start: true
+    trim_end: false
+  force: false
+
+training:
+  video_finetune:
+    enabled: true
+    experiment: so101
+    launch:
+      nproc_per_node: 4
+      dryrun: false
+      output_root: null  # set via IMAGINAIRE_OUTPUT_ROOT env var or override
+    job:
+      project: rl-mimic-backbone
+      group: so101
+      name: task1and2subsampled
+    wandb:
+      enabled: true
+    upload:
+      hf_repo_id: cdeubel/so101-cosmos-lora  # private HF repo for checkpoints
+    video_model:
+      num_frames: 25      # 5 obs + 20 future = 25 total (must satisfy 1 + 4k)
+      obs_history: 5
+      state_t: 7          # get_latent_num_frames(25) = 1 + 24//4 = 7
+    dataset:
+      val_ratio: 0.04  # ~2/50 episodes held out for validation loss monitoring
+      precompute_vae_latents: true
+    eval_video:
+      enabled: false
+      episode_stem: source000_episode_000062
+      seed_start_frame: 0
+      num_seed_frames: 5
+      seed: 0
+      guidance: 7.0
+      num_sampling_step: 35
+    trainer:
+      max_iter: 10000
+      logging_iter: 100
+      validation_iter: 100  # check val loss every 100 steps
+      validate_at_epoch_end: false
+      run_validation: true
+      grad_accum_iter: 1
+      max_val_iter: 4
+      timeout_period: 999999999
+      grad_clip_norm: 1.0  # tighter clip for LoRA (was 10.0)
+    checkpoint:
+      save_iter: 100
+      save_at_epoch_end: false
+      keep_latest: 5
+      load_path: null
+      load_training_state: false
+      only_load_scheduler_state: false
+      strict_resume: true
+      verbose: true
+      load_ema_to_reg: false
+    dataloader_train:
+      batch_size: 8
+      num_workers: 8  # bumped from 4 for H200 throughput
+      persistent_workers: true
+      prefetch_factor: 2  # was null
+      pin_memory: true
+      drop_last: true
+      in_order: false
+    dataloader_val:
+      batch_size: 1
+      num_workers: 2
+      persistent_workers: false
+      prefetch_factor: null
+      pin_memory: false
+      drop_last: false
+      in_order: true
+    optimizer:
+      lr: 0.0001778  # lowered from 1.778e-4; effective LoRA LR = lr * alpha/rank = 1e-4 * 0.125 = 1.25e-5
+      weight_decay: 0.1
+      betas: [0.9, 0.99]
+      eps: 0.00000001
+      master_weights: true
+      capturable: true
+  action_decoder:
+    enabled: false

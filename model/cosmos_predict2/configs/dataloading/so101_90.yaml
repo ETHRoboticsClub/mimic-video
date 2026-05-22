@@ -1,0 +1,4 @@
+defaults:
+  - dataset: so101
+  - policy_io: so101_90
+  - _self_

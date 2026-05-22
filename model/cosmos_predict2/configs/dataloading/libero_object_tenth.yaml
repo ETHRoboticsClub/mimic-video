@@ -1,0 +1,8 @@
+defaults:
+  - dataset: libero
+  - policy_io: libero
+  - _self_
+
+dataset:
+  dataset:
+    data_dir: /path/to/libero_object_tenth

@@ -1,0 +1,4 @@
+defaults:
+  - dataset: bridge
+  - policy_io: bridge
+  - _self_

@@ -1,0 +1,45 @@
+img_resize_sizes: [480, 640]
+
+# Delta-action variant of policy_io/so101_90.yaml. Same horizons; the dataloader
+# subtracts the last-observed joint state from each action timestep (see the
+# SubtractObsReference transform in so101_to_so101_90_delta).
+policy_io:
+  action:
+    workspace_rgb:
+      horizon: 56
+      normalization_type: ${NormalizationType:NONE}
+      target_repr: null
+      target_frequency: 10
+      shift_right_by: 0.1
+    joint_action_lowdim:
+      horizon: 90
+      normalization_type: ${NormalizationType:VARIANCE}
+      target_repr: ${LieRepr:ABSOLUTE}
+      target_frequency: 30
+      shift_right_by: 0
+  obs:
+    workspace_rgb:
+      horizon: 5
+      normalization_type: ${NormalizationType:NONE}
+      target_repr: null
+      target_frequency: 10
+      shift_right_by: 0
+    joint_state_lowdim:
+      horizon: 1
+      normalization_type: ${NormalizationType:VARIANCE}
+      target_repr: ${LieRepr:ABSOLUTE}
+      target_frequency: 30
+      shift_right_by: 0
+    language_embedding:
+      horizon: 1
+      normalization_type: ${NormalizationType:NONE}
+      target_repr: null
+      target_frequency: null
+      shift_right_by: 0
+
+concat_groups:
+  action/lowdim_concat:
+    - action/joint_action_lowdim
+
+  obs/lowdim_concat:
+    - obs/joint_state_lowdim

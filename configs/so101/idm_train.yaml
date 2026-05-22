@@ -1,0 +1,119 @@
+preprocessing:
+  source:
+    repo_id: rl26-world-models/so101-task1-mini-v1-positions
+    revision: main
+  text_encoder:
+    model_id: google-t5/t5-large # upgrade to T5-11B
+    revision: main
+  instruction: the robot arm pushes the white object towards the goal circle
+  video_feature: observation.images.front
+  exclude_episodes: [4]
+  image:
+    crop_xywh: [0, 0, 640, 480]
+    output_size_hw: [480, 640]
+  contact_sheet:
+    enabled: false
+  force: false
+
+training:
+  video_finetune:
+    enabled: false
+  action_decoder:
+    enabled: true
+    experiment: so101
+    launch:
+      nproc_per_node: 2
+      dryrun: false
+      output_root: null  # set via IMAGINAIRE_OUTPUT_ROOT env var (injected by the launch script)
+    job:
+      project: mimic-idm
+      group: so101
+      name: incbatch
+    wandb:
+      enabled: true
+    dataset:
+      num_val_episodes: 0
+      val_episode_ranges:
+        - episode: 0
+          start_s: 8
+          end_s: 10.0
+        - episode: 1
+          start_s: 11.5
+          end_s: 12.8
+    trainer:
+      max_iter: 500000
+      logging_iter: 1000
+      validation_iter: 50
+      run_validation: true
+      grad_accum_iter: 1
+      max_val_iter: 30
+      timeout_period: 999999999
+      grad_clip_norm: 10.0
+    checkpoint:
+      save_iter: 25
+      keep_latest: 3
+      load_path: null
+      load_training_state: false
+      only_load_scheduler_state: false
+      strict_resume: true
+      verbose: true
+      load_ema_to_reg: false
+    dataloader_train:
+      batch_size: 16
+      num_workers: 5
+      persistent_workers: true
+      prefetch_factor: 1
+      pin_memory: true
+      drop_last: true
+      in_order: false
+    dataloader_val:
+      batch_size: 8
+    optimizer:
+      lr: 0.0001
+      weight_decay: 0.1
+      betas: [0.9, 0.99]
+      eps: 0.00000001
+      master_weights: true
+      capturable: true
+    lr_scheduler:
+      warm_up_steps: [1000]
+      cycle_lengths: [500000]
+      f_start: [0.000001]
+      f_max: [1.0]
+      f_min: [0.2]
+    model:
+      train_architecture: base
+      lora_rank: 16
+      lora_alpha: 16
+      lora_target_modules: q_proj,k_proj,v_proj,output_proj,mlp.layer1,mlp.layer2
+      init_lora_weights: true
+      precision: bfloat16
+      loss_reduce: mean
+      loss_scale: 10.0
+      validation_mode: gt_video
+      action_dit_path: ""
+      video_dit_path: null
+      xattn_layer_idx: 20
+      video_guardrail_enabled: false
+      fsdp_shard_size: 0
+    action_scheduler:
+      alpha: 1.0
+      beta: 1.0
+      num_denoising_steps: 10
+    ema:
+      enabled: false
+    network:
+      max_horizon: 61
+      in_channels: 6
+      out_channels: 6
+      model_channels: 256
+      num_blocks: 4
+      num_heads: 4
+      mlp_ratio: 4.0
+      atten_backend: flash_attn_no_cp
+      crossattn_emb_channels: 2048
+      use_adaln_lora: true
+      adaln_lora_dim: 64
+      pair_timestep_feature_rank: 256
+      sac_mode: none
+      sac_every_n_blocks: 1

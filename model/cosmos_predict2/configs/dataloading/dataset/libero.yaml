@@ -1,0 +1,48 @@
+defaults:
+  - transform@_here_: libero_to_${policy_io}
+  - _self_
+
+data_components:
+  workspace_rgb:
+    obs_type: ${ObsType:RGB}
+    repr: null
+  wrist_rgb:
+    obs_type: ${ObsType:RGB}
+    repr: null
+  eef_pos_ref_delta_lowdim:
+    obs_type: ${ObsType:CARTESIAN_POS}
+    repr: ${LieRepr:OTHER}
+  eef_rot_ref_delta_lowdim:
+    obs_type: ${ObsType:ROTATION_MATRIX}
+    repr: ${LieRepr:OTHER}
+  gripper_action_lowdim:
+    obs_type: ${ObsType:BINARY_GRIPPER}
+    repr: null
+  eef_pos_lowdim:
+    obs_type: ${ObsType:ROTATION_MATRIX}
+    repr: ${LieRepr:OTHER}  # it's absolute but we shouldn't have to interpolate
+  eef_rot_lowdim:
+    obs_type: ${ObsType:QUAT}
+    repr: ${LieRepr:OTHER}  # it's absolute but we shouldn't have to interpolate
+  gripper_lowdim:
+    obs_type: ${ObsType:JOINT_POS}
+    repr: ${LieRepr:OTHER}  # it's absolute but we shouldn't have to interpolate
+  language_instruction:
+    obs_type: ${ObsType:LANGUAGE}
+    repr: null
+  language_embedding:
+    obs_type: ${ObsType:LANGUAGE_EMBEDDING}
+    repr: null
+
+dataset:
+  _target_: cosmos_predict2.data.action.dataset_action.MimicDataset
+  _convert_: partial
+  data_dir: ???
+  timestep_anchor: workspace_rgb
+  data_components: ${..data_components}
+  data_transforms: ${..data_transforms}
+  source_component_names: ${..source_component_names}
+  policy_io: ${policy_io.policy_io}
+  should_include_padded_tails: True
+  seed: 42
+  num_val_episodes: 0

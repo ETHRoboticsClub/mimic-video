@@ -1,0 +1,71 @@
+img_resize_sizes: [480, 640]
+
+policy_io:
+  action:
+    workspace_rgb:
+      horizon: 56
+      normalization_type: ${NormalizationType:NONE}
+      target_repr: null
+      target_frequency: 5
+      shift_right_by: 0.2
+    eef_rot_lowdim:
+      horizon: 15
+      normalization_type: ${NormalizationType:IDENTITY}
+      target_repr: ${LieRepr:RELATIVE}
+      target_frequency: 5
+      shift_right_by: 0.2
+    eef_pos_lowdim:
+      horizon: 15
+      normalization_type: ${NormalizationType:VARIANCE}
+      target_repr: ${LieRepr:RELATIVE}
+      target_frequency: 5
+      shift_right_by: 0.2
+    gripper_action_lowdim:
+      horizon: 15
+      normalization_type: ${NormalizationType:VARIANCE}
+      target_repr: ${LieRepr:ABSOLUTE}
+      target_frequency: 5
+      shift_right_by: 0.2
+  obs:
+    workspace_rgb:
+      horizon: 5
+      normalization_type: ${NormalizationType:NONE}
+      target_repr: null
+      target_frequency: 5
+      shift_right_by: 0
+    eef_pos_lowdim:
+      horizon: 1
+      normalization_type: ${NormalizationType:VARIANCE}
+      target_repr: ${LieRepr:ABSOLUTE}
+      target_frequency: 5
+      shift_right_by: 0
+    eef_rot_lowdim:
+      horizon: 1
+      normalization_type: ${NormalizationType:IDENTITY}
+      target_repr: ${LieRepr:ABSOLUTE}
+      target_frequency: 5
+      shift_right_by: 0
+    gripper_state_lowdim:
+      horizon: 1
+      normalization_type: ${NormalizationType:VARIANCE}
+      target_repr: ${LieRepr:ABSOLUTE}
+      target_frequency: 5
+      shift_right_by: 0
+    language_embedding:
+      horizon: 1
+      normalization_type: ${NormalizationType:NONE}
+      target_repr: null
+      target_frequency: null
+      shift_right_by: 0
+
+
+concat_groups:
+  action/lowdim_concat:
+    - action/eef_pos_lowdim
+    - action/eef_rot_lowdim
+    - action/gripper_action_lowdim
+
+  obs/lowdim_concat:
+    - obs/eef_pos_lowdim
+    - obs/eef_rot_lowdim
+    - obs/gripper_state_lowdim
