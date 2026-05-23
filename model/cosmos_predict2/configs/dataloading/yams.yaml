@@ -1,0 +1,8 @@
+defaults:
+  - dataset: bi_yams
+  - policy_io: bi_yams
+  - _self_
+
+dataset:
+  dataset:
+    data_dir: ~/zarr/
