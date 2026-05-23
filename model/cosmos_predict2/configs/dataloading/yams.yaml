@@ -1,6 +1,6 @@
 defaults:
-  - dataset: bi_yams
-  - policy_io: bi_yams
+  - dataset: lerobot_bi_yams
+  - policy_io: lerobot_bi_yams
   - _self_
 
 dataset:

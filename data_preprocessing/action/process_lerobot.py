@@ -124,10 +124,8 @@ def _convert(
         sub = sub.head(effective).reset_index(drop=True)
         length = effective
 
-    # action / state are fixed_size_list[14]; pyarrow→pandas yields ndarray-of-lists
-    action = np.stack(sub["action"].to_numpy()).astype(np.float32)
+    # state is fixed_size_list[14]; pyarrow->pandas yields ndarray-of-lists
     state = np.stack(sub["observation.state"].to_numpy()).astype(np.float32)
-    assert action.shape == (length, 14), action.shape
     assert state.shape == (length, 14), state.shape
 
     # videos
@@ -146,13 +144,12 @@ def _convert(
         decoded[out_key], eff = _decode_segment(vp, from_ts, length, fps)
         effective_lengths.append(eff)
 
-    # If any camera was truncated (video ran past EOF), align all cams + action/state to the min.
+    # If any camera was truncated (video ran past EOF), align all cams + state to the min.
     min_eff = min(effective_lengths)
     if min_eff < length:
         print(f"WARN episode {ep_idx}: video truncation, length {length} -> {min_eff}")
         for out_key in list(decoded.keys()):
             decoded[out_key] = decoded[out_key][:min_eff]
-        action = action[:min_eff]
         state = state[:min_eff]
         sub = sub.head(min_eff).reset_index(drop=True)
         length = min_eff
@@ -206,14 +203,6 @@ def _convert(
         "joint_state_lowdim_timestamps", shape=(length,), dtype="uint64", chunks=(length,),
     )[...] = timestamps
 
-    root.create_dataset(
-        "joint_action_lowdim", shape=action.shape, dtype=np.float32,
-        chunks=(t_ld, action.shape[1]), compressor=comp,
-    )[...] = action
-    root.create_dataset(
-        "joint_action_lowdim_timestamps", shape=(length,), dtype="uint64", chunks=(length,),
-    )[...] = timestamps
-
     return f"ok: ep {ep_idx:04d} -> {out_path.name} (T={length})"
 
 
@@ -232,8 +221,8 @@ def main():
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
-    ep_df = _load_episodes_meta(args.dataset_dir)
-    tasks = _load_tasks(args.dataset_dir)
+    ep_df = _load_episodes_meta(args.dataset_path)
+    tasks = _load_tasks(args.dataset_path)
     print(f"loaded {len(tasks)} task(s): {tasks}")
 
     if args.episodes is not None:

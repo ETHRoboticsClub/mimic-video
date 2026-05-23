@@ -3,21 +3,6 @@ data_transforms:
     targets: [workspace_rgb]
     resize_sizes: ${policy_io.img_resize_sizes}
 
-  - name: ConvertLowdimRepr
-    targets: [action/eef_pose_lowdim]
-    additional_data: { relative_base_value: obs/eef_pose_lowdim }
-    relative_base_value_idx: -1
-
-  - name: DeconstructPoseMat
-    targets: [action/eef_pose_lowdim]
-    out_key_prefix: action/eef
-  - name: DeconstructPoseMat
-    targets: [obs/eef_pose_lowdim]
-    out_key_prefix: obs/eef
-
-  - name: RotationMatrixTo6D
-    targets: [action/eef_rot_lowdim, obs/eef_rot_lowdim]
-
   - name: Flatten
     targets: [lowdim]
 
@@ -28,9 +13,4 @@ data_transforms:
     targets: ${policy_io.concat_groups.obs/lowdim_concat}
     out_key: "obs/lowdim_concat"
 
-source_component_names:
-  obs/eef_pos_lowdim: eef_pose_lowdim
-  obs/eef_rot_lowdim: eef_pose_lowdim
-
-  action/eef_pos_lowdim: eef_pose_lowdim
-  action/eef_rot_lowdim: eef_pose_lowdim
+source_component_names: {}

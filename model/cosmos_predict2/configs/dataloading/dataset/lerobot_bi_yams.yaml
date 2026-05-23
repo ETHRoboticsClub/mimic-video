@@ -3,23 +3,12 @@ defaults:
   - _self_
 
 data_components:
-  topdown:
+  workspace_rgb:
     obs_type: ${ObsType:RGB}
     repr: null
-  joints_state_lowdim:
-    obs_type: ${ObsType.JOINT_POS}
+  joint_state_lowdim:
+    obs_type: ${ObsType:JOINT_POS}
     repr: ${LieRepr:ABSOLUTE}
-  # TODO: add wrist cams
-  
-  # eef_pose_lowdim:
-  #   obs_type: ${ObsType:POSE_MATRIX}
-  #   repr: ${LieRepr:ABSOLUTE}
-  # gripper_state_lowdim:
-  #   obs_type: ${ObsType:JOINT_POS}
-  #   repr: ${LieRepr:ABSOLUTE}
-  # gripper_action_lowdim:
-  #   obs_type: ${ObsType:JOINT_POS}
-  #   repr: ${LieRepr:ABSOLUTE}
   language_instruction:
     obs_type: ${ObsType:LANGUAGE}
     repr: null
