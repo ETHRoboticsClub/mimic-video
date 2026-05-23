@@ -50,6 +50,7 @@ dependencies = [
   "imageio[pyav,ffmpeg]==2.37.0",
   "iopath==0.1.10",
   "ipdb==0.13.13",
+  "ipykernel>=7.2.0",
   "loguru==0.7.3",
   "mediapy==1.2.4",
   "megatron-core==0.12.1",
