@@ -1,0 +1,1 @@
+PYTHONPATH=model python data_preprocessing/action/precompute_t5.py --dataset-path ~/zarr
