@@ -9,3 +9,5 @@ __pycache__/
 .omo/
 .env
 data
+
+*.DS_Store
