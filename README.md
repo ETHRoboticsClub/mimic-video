@@ -38,6 +38,7 @@ cd model
 uv sync --extra cu128
 source .venv/bin/activate
 ```
+On Apple Silicon Macs, use `uv sync --extra macos` instead.
 
 2. (Optional) Download trained bridge or libero checkpoints.
 ```bash
