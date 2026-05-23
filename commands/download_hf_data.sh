@@ -15,7 +15,7 @@ HF_PATH="$HF_ORG/$HF_REPO"
 cd "$REPO_ROOT"
 source ".env"
 cd "$REPO_ROOT/model/"
-uv sync
+uv sync --extra macos
 source .venv/bin/activate
 cd "$REPO_ROOT"
 
