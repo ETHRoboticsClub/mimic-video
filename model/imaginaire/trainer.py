@@ -176,6 +176,7 @@ class ImaginaireTrainer:
         iteration = self.checkpointer.load(model, optimizer, scheduler, grad_scaler)
         grad_accum_iter = 0
         log.critical(f"Distributed parallelism mode: {self.config.trainer.distributed_parallelism}")
+        log.critical(f"Batch size: {dataloader_train.batch_size} per GPU, {dataloader_train.batch_size * distributed.get_world_size()} global")
         if self.config.trainer.distributed_parallelism == "ddp":
             # Create a DDP model wrapper.
             model_ddp = distributed.parallel_model_wrapper(self.config.trainer.ddp, model)
