@@ -5,4 +5,4 @@ defaults:
 
 dataset:
   dataset:
-    data_dir: ~/zarr/
+    data_dir: ${oc.env:DATA_DIR,~/zarr/}
