@@ -56,7 +56,7 @@ class WandbLogger(EveryN):
             )
             log.info(f"WandbLogger: wandb.init OK — project={project} run={wandb.run.name} url={wandb.run.url}")
         except Exception as e:
-            log.warning(f"WandbLogger: wandb.init failed ({type(e).__name__}: {e}); continuing without WandB.")
+            log.critical(f"WandbLogger: wandb.init FAILED ({type(e).__name__}: {e}); no WandB logging this run.")
             self._wandb = None
 
     @rank0_only

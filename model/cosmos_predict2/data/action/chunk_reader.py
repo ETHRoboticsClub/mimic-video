@@ -120,7 +120,12 @@ class ChunkReader:
         max_shift_duration: float,
         verbose: bool,
     ) -> tuple[np.ndarray | None, int]:
-        with zarr.open(str(episode_path), "r") as root:
+        try:
+            root_ctx = zarr.open(str(episode_path), "r")
+        except Exception as e:
+            self._logger.warning(f"Episode {episode_path} cannot be opened: {e}. Skipping.")
+            return None, 0
+        with root_ctx as root:
             try:
                 min_num_timestamps = min(
                     len(root[f"{component.split('/')[1]}_timestamps"])
