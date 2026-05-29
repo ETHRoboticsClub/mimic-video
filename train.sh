@@ -13,6 +13,7 @@ cd "$(dirname "$0")/model"
 TORCH_NCCL_HEARTBEAT_TIMEOUT_SEC="${TORCH_NCCL_HEARTBEAT_TIMEOUT_SEC:-7200}" \
 CUDA_DEVICE_MAX_CONNECTIONS="${CUDA_DEVICE_MAX_CONNECTIONS:-1}" \
 NVTE_FUSED_ATTN="${NVTE_FUSED_ATTN:-0}" \
+NVTE_FLASH_ATTN="${NVTE_FLASH_ATTN:-0}" \
 torchrun --nproc_per_node="${NPROC_PER_NODE}" --master_port="${MASTER_PORT}" -m scripts.train \
   --config=cosmos_predict2/configs/config.py \
   -- experiment="${EXPERIMENT}" \

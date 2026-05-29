@@ -73,7 +73,8 @@ def init() -> int | None:
         # Convert the timeout to an integer (if it isn't already) and then to a timedelta
         timeout_timedelta = timedelta(seconds=int(timeout_seconds))
         dist.init_process_group(
-            backend="nccl", init_method="env://", timeout=timeout_timedelta
+            backend="nccl", init_method="env://", timeout=timeout_timedelta,
+            device_id=torch.device(f"cuda:{local_rank}"),
         )
         log.info(
             f"Initialized distributed training with local rank {local_rank} with timeout {timeout_seconds}",
