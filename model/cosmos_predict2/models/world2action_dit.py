@@ -33,6 +33,7 @@ from transformer_engine.pytorch.attention import (
     apply_rotary_pos_emb,
 )
 
+from cosmos_predict2.module.a2a_cp import MinimalA2AAttnOp
 from cosmos_predict2.networks.selective_activation_checkpoint import (
     CheckpointMode,
     SACConfig,
@@ -262,6 +263,8 @@ class Attention(nn.Module):
                 qkv_format=qkv_format,
                 attn_mask_type="no_mask",
             )
+        elif self.backend == "minimal_a2a":
+            self.attn_op = MinimalA2AAttnOp()
         elif self.backend == "torch":
             self.attn_op = torch_attention_op
         elif self.backend == "flash_attn_no_cp":
@@ -324,7 +327,8 @@ class Attention(nn.Module):
         return q, k, v
 
     def compute_attention(self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor) -> torch.Tensor:
-        result = self.attn_op(q, k, v)  # [B, S, H, D]
+        result = self.attn_op(q, k, v)   # [B, S, H, D]
+        assert result.ndim == 4, "flash attention error"
         result = rearrange(result, "b s h d -> b s (h d)")
         return self.output_dropout(self.output_proj(result))
 

@@ -27,4 +27,4 @@ dataset:
   policy_io: ${policy_io.policy_io}
   should_include_padded_tails: True
   seed: 42
-  num_val_episodes: 20
+  num_val_episodes: 10
