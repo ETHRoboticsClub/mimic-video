@@ -7,7 +7,7 @@ VIDEO_CKPT="${VIDEO_CKPT:-checkpoints/video_backbone/cosmos-predict2_v2w_480p_10
 NPROC_PER_NODE="${NPROC_PER_NODE:-4}"
 MASTER_PORT="${MASTER_PORT:-12341}"
 ACTION_ATTN_BACKEND="${ACTION_ATTN_BACKEND:-torch}"
-MAX_VAL_ITER="${MAX_VAL_ITER:-30}"
+MAX_VAL_ITER="${MAX_VAL_ITER:-3}"
 
 cd "$(dirname "$0")/model"
 
