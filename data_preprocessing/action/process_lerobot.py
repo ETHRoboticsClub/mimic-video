@@ -19,10 +19,6 @@ def _load_episodes_meta(dataset_dir: pathlib.Path) -> pd.DataFrame:
     keep = [
         "episode_index",
         "length",
-        "data/chunk_index",
-        "data/file_index",
-        "dataset_from_index",
-        "dataset_to_index",
         "videos/observation.images.topdown/chunk_index",
         "videos/observation.images.topdown/file_index",
         "videos/observation.images.topdown/from_timestamp",
@@ -94,6 +90,7 @@ def _convert(
     out_dir: pathlib.Path,
     fps: int,
     overwrite: bool,
+    train_parquet: pathlib.Path,
 ) -> str:
     ep_idx = int(ep_row["episode_index"])
     out_path = out_dir / f"episode_{ep_idx:04d}.zarr"
@@ -101,15 +98,8 @@ def _convert(
         return f"skip (exists): {out_path}"
 
     length = int(ep_row["length"])
-    data_chunk = int(ep_row["data/chunk_index"])
-    data_file = int(ep_row["data/file_index"])
-    parquet_path = dataset_dir / "data" / f"chunk-{data_chunk:03d}" / f"file-{data_file:03d}.parquet"
-    table = pq.read_table(parquet_path)
-
-    # rows for this episode are contiguous; locate by exact frame_index window
-    df = table.to_pandas()
-    mask = df["episode_index"] == ep_idx
-    sub = df.loc[mask].sort_values("frame_index").reset_index(drop=True)
+    df = pq.read_table(train_parquet).to_pandas()
+    sub = df.loc[df["episode_index"] == ep_idx].sort_values("frame_index").reset_index(drop=True)
     task_text = str(sub["task"].iloc[0])
     if len(sub) != length:
         # HF fs26 dataset has occasional mismatch between parquet row count and
@@ -218,6 +208,9 @@ def main():
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     ep_df = _load_episodes_meta(args.dataset_path)
+    train_files = sorted(args.dataset_path.glob("data/train-*.parquet"))
+    assert train_files, f"no train-*.parquet found under {args.dataset_path / 'data'}"
+    train_parquet = train_files[0]  # single-shard dataset
 
     if args.episodes is not None:
         ep_df = ep_df[ep_df["episode_index"].isin(args.episodes)].reset_index(drop=True)
@@ -229,6 +222,7 @@ def main():
         out_dir=args.output_dir,
         fps=args.fps,
         overwrite=args.overwrite,
+        train_parquet=train_parquet,
     )
     if args.num_workers <= 1:
         for r in tqdm.tqdm(rows, desc="bi_yams -> zarr"):
