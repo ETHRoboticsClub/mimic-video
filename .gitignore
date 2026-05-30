@@ -1,4 +1,5 @@
 model/checkpoints
+model/wandb/
 eval/*/results
 nohup.out
 uv.lock
