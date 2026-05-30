@@ -1,58 +1,14 @@
 import argparse
 import pathlib
-from functools import partial
-from multiprocessing import Pool
 
-import decord
 import numpy as np
-import pandas as pd
-import pyarrow.parquet as pq
 import zarr
+from lerobot.datasets.lerobot_dataset import LeRobotDataset
 from numcodecs import Blosc
+from torch.utils.data import DataLoader, Subset
 import tqdm
 
 NS_PER_SEC = 1_000_000_000
-
-
-def _load_episodes_meta(dataset_dir: pathlib.Path) -> pd.DataFrame:
-    files = sorted((dataset_dir / "meta" / "episodes").glob("**/file-*.parquet"))
-    keep = [
-        "episode_index",
-        "length",
-        "videos/observation.images.topdown/chunk_index",
-        "videos/observation.images.topdown/file_index",
-        "videos/observation.images.topdown/from_timestamp",
-        "videos/observation.images.topdown/to_timestamp",
-        "videos/observation.images.left_wrist/chunk_index",
-        "videos/observation.images.left_wrist/file_index",
-        "videos/observation.images.left_wrist/from_timestamp",
-        "videos/observation.images.left_wrist/to_timestamp",
-        "videos/observation.images.right_wrist/chunk_index",
-        "videos/observation.images.right_wrist/file_index",
-        "videos/observation.images.right_wrist/from_timestamp",
-        "videos/observation.images.right_wrist/to_timestamp",
-    ]
-    dfs = [pq.read_table(f, columns=keep).to_pandas() for f in files]
-    return pd.concat(dfs).reset_index(drop=True).sort_values("episode_index").reset_index(drop=True)
-
-
-
-def _decode_segment(video_path: pathlib.Path, from_ts: float, length: int, fps: int) -> tuple[np.ndarray, int]:
-    """Decode a video segment, truncating to actual video length if the request runs past EOF.
-
-    Returns (frames, effective_length) where effective_length <= length.
-    """
-    vr = decord.VideoReader(str(video_path), ctx=decord.cpu(0), num_threads=1)
-    start = int(round(from_ts * fps))
-    end = start + length
-    if end > len(vr):
-        # HF fs26: some later episodes claim frames past EOF — truncate.
-        end = len(vr)
-    effective = end - start
-    if effective <= 0:
-        raise ValueError(f"video {video_path.name}: requested start frame {start} >= total {len(vr)}")
-    idx = list(range(start, end))
-    return vr.get_batch(idx).asnumpy(), effective  # (T, H, W, 3) uint8, T
 
 
 def _assert_zarr_consistent(path: pathlib.Path) -> None:
@@ -71,166 +27,117 @@ def _assert_zarr_consistent(path: pathlib.Path) -> None:
     with zarr.open(str(path), "r") as root:
         target_dim = root["joint_action_lowdim"].shape[0]
         for k in keys:
-            assert root[k].shape[0] == target_dim, f"got bad dims for k {k} and root {path}"
-
-
-def _convert_safe(ep_row, **kwargs):
-    """Wrap _convert to catch decord/codec failures so the pool doesn't die."""
-    try:
-        return _convert(ep_row, **kwargs)
-    except Exception as e:
-        ep_idx = int(ep_row.get("episode_index", -1))
-        return f"FAIL ep {ep_idx}: {type(e).__name__}: {str(e)[:200]}"
+            assert root[k].shape[0] == target_dim, f"got bad dims for k={k} in {path}"
 
 
 def _convert(
-    ep_row: pd.Series,
+    ep_idx: int,
+    out_ep_idx: int,
     *,
-    dataset_dir: pathlib.Path,
+    dataset: LeRobotDataset,
     out_dir: pathlib.Path,
-    fps: int,
     overwrite: bool,
-    train_parquet: pathlib.Path,
+    task_override: str | None = None,
 ) -> str:
-    ep_idx = int(ep_row["episode_index"])
-    out_path = out_dir / f"episode_{ep_idx:04d}.zarr"
+    out_path = out_dir / f"episode_{out_ep_idx:04d}.zarr"
     if out_path.exists() and not overwrite:
-        return f"skip (exists): {out_path}"
+        return f"skip: {out_path.name}"
 
-    length = int(ep_row["length"])
-    df = pq.read_table(train_parquet).to_pandas()
-    sub = df.loc[df["episode_index"] == ep_idx].sort_values("frame_index").reset_index(drop=True)
-    task_text = str(sub["task"].iloc[0])
-    if len(sub) != length:
-        # HF fs26 dataset has occasional mismatch between parquet row count and
-        # meta length. Truncate both action/state and video segment to min.
-        effective = min(len(sub), length)
-        print(f"WARN episode {ep_idx}: parquet has {len(sub)} rows but meta says length={length}; truncating to {effective}")
-        sub = sub.head(effective).reset_index(drop=True)
-        length = effective
+    ep = dataset.meta.episodes[ep_idx]
+    start, end = ep["dataset_from_index"], ep["dataset_to_index"]
+    length = end - start
+    fps = dataset.fps
 
-    # state is fixed_size_list[14]; pyarrow->pandas yields ndarray-of-lists
-    state = np.stack(sub["observation.state"].to_numpy()).astype(np.float32)
-    assert state.shape == (length, 14), state.shape
+    ep_data = dataset.hf_dataset[start:end]
+    state  = np.stack(ep_data["observation.state"]).astype(np.float32)  # (T, 14)
+    action = np.stack(ep_data["action"]).astype(np.float32)             # (T, 14)
+    task_text = task_override if task_override is not None else ep["tasks"][0]
 
-    # videos
     cams = {
-        "workspace_rgb": "observation.images.topdown",
+        "workspace_rgb":  "observation.images.topdown",
         "wrist_rgb_left": "observation.images.left_wrist",
-        "wrist_rgb_right": "observation.images.right_wrist",
+        "wrist_rgb_right":"observation.images.right_wrist",
     }
-    decoded = {}
-    effective_lengths = []
-    for out_key, cam_key in cams.items():
-        chunk = int(ep_row[f"videos/{cam_key}/chunk_index"])
-        fid = int(ep_row[f"videos/{cam_key}/file_index"])
-        from_ts = float(ep_row[f"videos/{cam_key}/from_timestamp"])
-        vp = dataset_dir / "videos" / cam_key / f"chunk-{chunk:03d}" / f"file-{fid:03d}.mp4"
-        decoded[out_key], eff = _decode_segment(vp, from_ts, length, fps)
-        effective_lengths.append(eff)
 
-    # If any camera was truncated (video ran past EOF), align all cams + state to the min.
-    min_eff = min(effective_lengths)
-    if min_eff < length:
-        print(f"WARN episode {ep_idx}: video truncation, length {length} -> {min_eff}")
-        for out_key in list(decoded.keys()):
-            decoded[out_key] = decoded[out_key][:min_eff]
-        state = state[:min_eff]
-        sub = sub.head(min_eff).reset_index(drop=True)
-        length = min_eff
-
-    for out_key, arr in decoded.items():
-        if arr.shape != (length, 480, 640, 3):
-            msg = f"episode {ep_idx} {out_key}: shape {arr.shape}, expected ({length},480,640,3)"
-            raise ValueError(msg)
-
-    # synthesize timestamps from frame_index for tight monotonicity
-    dt_ns = NS_PER_SEC / fps
-    timestamps = (sub["frame_index"].to_numpy().astype(np.uint64) * 0) + (
-        np.arange(length, dtype=np.uint64) * np.uint64(dt_ns)
+    loader = DataLoader(
+        Subset(dataset, list(range(start, end))),
+        batch_size=64,
+        num_workers=4,
+        shuffle=False,
     )
-    if not np.all(np.diff(timestamps) > 0):
-        msg = f"episode {ep_idx}: timestamps not strictly increasing"
-        raise ValueError(msg)
 
-    comp = Blosc(cname="lz4", clevel=1, shuffle=Blosc.BITSHUFFLE)
+    decoded = {k: [] for k in cams}
+    for batch in tqdm.tqdm(loader, desc=f"ep {out_ep_idx:04d} frames", leave=False):
+        for out_key, cam_key in cams.items():
+            imgs = batch[cam_key]  # (B, C, H, W) float32 [0, 1]
+            imgs_np = (imgs.permute(0, 2, 3, 1).numpy() * 255).clip(0, 255).astype(np.uint8)
+            decoded[out_key].append(imgs_np)
+
+    decoded = {k: np.concatenate(v) for k, v in decoded.items()}  # (T, H, W, 3)
+
+    timestamps = np.arange(length, dtype=np.uint64) * np.uint64(NS_PER_SEC / fps)
+    comp  = Blosc(cname="lz4", clevel=1, shuffle=Blosc.BITSHUFFLE)
     t_img = min(65, length)
-    t_ld = min(1024, length)
+    t_ld  = min(1024, length)
 
     root = zarr.open(str(out_path), mode="w")
 
-    # language (one constant string for this dataset; embedding added by precompute_t5.py)
-    root.create_dataset(
-        "language_instruction",
-        shape=(1,), dtype=bytes, chunks=(1,), compressor=comp, overwrite=True,
-    )[...] = np.array([task_text.encode()])
-    root.create_dataset(
-        "language_instruction_timestamps",
-        shape=(1,), dtype="uint64", chunks=(1,), compressor=comp, overwrite=True,
-    )[...] = np.array([0], dtype=np.uint64)
+    root.create_dataset("language_instruction", shape=(1,), dtype=bytes, chunks=(1,), compressor=comp)[...] = np.array([task_text.encode()])
+    root.create_dataset("language_instruction_timestamps", shape=(1,), dtype="uint64", chunks=(1,), compressor=comp)[...] = np.array([0], dtype=np.uint64)
 
-    # images
     for out_key, arr in decoded.items():
-        root.create_dataset(
-            out_key, shape=arr.shape, dtype=np.uint8,
-            chunks=(t_img, *arr.shape[1:]), compressor=comp,
-        )[...] = arr
-        root.create_dataset(
-            f"{out_key}_timestamps", shape=(length,), dtype="uint64", chunks=(length,),
-        )[...] = timestamps
+        root.create_dataset(out_key, shape=arr.shape, dtype=np.uint8, chunks=(t_img, *arr.shape[1:]), compressor=comp)[...] = arr
+        root.create_dataset(f"{out_key}_timestamps", shape=(length,), dtype="uint64", chunks=(length,))[...] = timestamps
 
-    # 14-dim joints
-    root.create_dataset(
-        "joint_state_lowdim", shape=state.shape, dtype=np.float32,
-        chunks=(t_ld, state.shape[1]), compressor=comp,
-    )[...] = state
-    root.create_dataset(
-        "joint_state_lowdim_timestamps", shape=(length,), dtype="uint64", chunks=(length,),
-    )[...] = timestamps
+    for key, arr in [("joint_state_lowdim", state), ("joint_action_lowdim", action)]:
+        root.create_dataset(key, shape=arr.shape, dtype=np.float32, chunks=(t_ld, arr.shape[1]), compressor=comp)[...] = arr
+        root.create_dataset(f"{key}_timestamps", shape=(length,), dtype="uint64", chunks=(length,))[...] = timestamps
 
     _assert_zarr_consistent(out_path)
-    return f"ok: ep {ep_idx:04d} -> {out_path.name} (T={length})"
+    return f"ok: ep {out_ep_idx:04d} (src {ep_idx}) -> {out_path.name} (T={length})"
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dataset-path", type=pathlib.Path, required=True,
-                    help="lerobot v3 dataset root (contains data/, videos/, meta/)")
-    ap.add_argument("--output-dir", type=pathlib.Path, required=True,
-                    help="folder to write per-episode .zarr files into")
-    ap.add_argument("--num-workers", type=int, default=1)
-    ap.add_argument("--fps", type=int, default=30)
-    ap.add_argument("--overwrite", action="store_true")
-    ap.add_argument("--episodes", type=int, nargs="*", default=None,
-                    help="optional subset of episode indices to process (default: all)")
+    ap.add_argument(
+        "--dataset", nargs=2, action="append", required=True,
+        metavar=("REPO_ID", "TASK_TEXT"),
+        help="dataset tuple: repo_id task_text. Use 'none' to keep the dataset's own text. Repeat for multiple datasets.",
+    )
+    ap.add_argument("--output-dir", type=pathlib.Path, required=True)
+    ap.add_argument("--overwrite",  action="store_true")
+    ap.add_argument("--episodes",   type=int, nargs="*", default=None,
+                    help="subset of episode indices to process per dataset (default: all)")
     args = ap.parse_args()
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
-    ep_df = _load_episodes_meta(args.dataset_path)
-    train_files = sorted(args.dataset_path.glob("data/train-*.parquet"))
-    assert train_files, f"no train-*.parquet found under {args.dataset_path / 'data'}"
-    train_parquet = train_files[0]  # single-shard dataset
+    out_ep_idx = 0
+    for repo_id, task_text in args.dataset:
+        task_override = None if task_text.lower() == "none" else task_text
+        print(f"\n=== loading {repo_id} ===")
+        try:
+            dataset = LeRobotDataset(repo_id)
+        except Exception as e:
+            print(f"FAIL loading {repo_id}: {type(e).__name__}: {str(e)[:200]}")
+            continue
 
-    if args.episodes is not None:
-        ep_df = ep_df[ep_df["episode_index"].isin(args.episodes)].reset_index(drop=True)
+        print(f"    {dataset.num_episodes} episodes, fps={dataset.fps}")
+        ep_indices = args.episodes if args.episodes is not None else range(dataset.num_episodes)
 
-    rows = [r for _, r in ep_df.iterrows()]
-    fn = partial(
-        _convert_safe,
-        dataset_dir=args.dataset_path,
-        out_dir=args.output_dir,
-        fps=args.fps,
-        overwrite=args.overwrite,
-        train_parquet=train_parquet,
-    )
-    if args.num_workers <= 1:
-        for r in tqdm.tqdm(rows, desc="bi_yams -> zarr"):
-            print(fn(r))
-    else:
-        with Pool(processes=args.num_workers) as pool:
-            for msg in tqdm.tqdm(pool.imap_unordered(fn, rows), total=len(rows), desc="bi_yams -> zarr"):
-                print(msg)
+        for ep_idx in tqdm.tqdm(ep_indices, desc=repo_id):
+            try:
+                msg = _convert(
+                    ep_idx, out_ep_idx,
+                    dataset=dataset,
+                    out_dir=args.output_dir,
+                    overwrite=args.overwrite,
+                    task_override=task_override,
+                )
+            except Exception as e:
+                msg = f"FAIL ep {ep_idx} (out {out_ep_idx}): {type(e).__name__}: {str(e)[:200]}"
+            print(msg)
+            out_ep_idx += 1
 
 
 if __name__ == "__main__":

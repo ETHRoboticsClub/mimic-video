@@ -1,0 +1,13 @@
+[project]
+name = "data-preprocessing"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "decord>=0.6.0",
+    "lerobot>=0.5.1",
+    "pytest>=9.0.3",
+    "numcodecs<0.13",
+    "zarr==2.18.3",
+    "jupyterlab>=4.5.7",
+    "matplotlib>=3.10.9",
+]
