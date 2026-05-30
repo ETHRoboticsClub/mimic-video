@@ -10,4 +10,4 @@ torchrun --nproc_per_node=1 -m scripts.train \
   --config=cosmos_predict2/configs/config.py \
   --dryrun \
   -- experiment="${EXPERIMENT}" \
-  data_config.dataset.dataset.data_dir="${DATA_DIR}"
+  data_config.data_dir="${DATA_DIR}"

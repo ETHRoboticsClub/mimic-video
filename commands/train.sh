@@ -12,6 +12,8 @@ VIDEO_CKPT="${VIDEO_CKPT:-checkpoints/video_backbone/cosmos-predict2_v2w_480p_10
 NPROC_PER_NODE="${NPROC_PER_NODE:-1}"
 MASTER_PORT="${MASTER_PORT:-12341}"
 OPTIMIZER="${OPTIMIZER:-fusedadamw}"
+ACTION_ATTN_BACKEND="${ACTION_ATTN_BACKEND:-torch}"
+MAX_VAL_ITER="${MAX_VAL_ITER:-30}"
 # ----------
 
 cd "$REPO_ROOT"
@@ -125,5 +127,8 @@ torchrun --nproc_per_node="$NPROC_PER_NODE" --master_port="$MASTER_PORT" -m scri
   --config=cosmos_predict2/configs/config.py \
   -- experiment="$EXPERIMENT" \
   optimizer="$OPTIMIZER" \
-  data_config.dataset.dataset.data_dir="$DATA_DIR" \
+  data_config.data_dir="$DATA_DIR" \
+  world2action_pipe.net.atten_backend="$ACTION_ATTN_BACKEND" \
+  model.config.pipe_config.net.atten_backend="$ACTION_ATTN_BACKEND" \
+  trainer.max_val_iter="$MAX_VAL_ITER" \
   model.config.video_dit_path="$VIDEO_CKPT"

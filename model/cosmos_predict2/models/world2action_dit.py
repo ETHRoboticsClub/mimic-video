@@ -325,7 +325,8 @@ class Attention(nn.Module):
 
     def compute_attention(self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor) -> torch.Tensor:
         result = self.attn_op(q, k, v)  # [B, S, H, D]
-        result = rearrange(result, "b s h d -> b s (h d)")
+        if result.ndim == 4:
+            result = rearrange(result, "b s h d -> b s (h d)")
         return self.output_dropout(self.output_proj(result))
 
     def forward(
