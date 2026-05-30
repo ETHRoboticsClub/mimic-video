@@ -8,6 +8,7 @@ NPROC_PER_NODE="${NPROC_PER_NODE:-4}"
 MASTER_PORT="${MASTER_PORT:-12341}"
 MAX_ITER="${MAX_ITER:-7000}"
 MAX_VAL_ITER="${MAX_VAL_ITER:-2}"
+BSZ="${BSZ:-128}"
 SMOKE_TEST="${SMOKE_TEST:-0}"
 
 cd "$(dirname "$0")/model"
@@ -17,6 +18,7 @@ OVERRIDES=(
     model.config.video_dit_path="${VIDEO_CKPT}"
     trainer.max_iter="${MAX_ITER}"
     trainer.max_val_iter="${MAX_VAL_ITER}"
+    dataloader_train.batch_size.global_bsz="${BSZ}"
 )
 
 if [ "${SMOKE_TEST}" = "1" ]; then
