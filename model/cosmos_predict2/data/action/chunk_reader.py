@@ -134,6 +134,22 @@ class ChunkReader:
                 )
                 return None, 0
 
+            for component, meta in self._data_components.items():
+                if meta["obs_type"] in ObsType.PERSISTENT:
+                    continue
+                key = component.split("/")[1]
+                try:
+                    data_len = len(root[key])
+                    ts_len = len(root[f"{key}_timestamps"])
+                except KeyError:
+                    continue
+                if data_len < ts_len:
+                    self._logger.warning(
+                        f"Episode {episode_path}: '{key}' has {data_len} entries "
+                        f"but '{key}_timestamps' has {ts_len}. Skipping."
+                    )
+                    return None, 0
+
             if min_num_timestamps <= 2:
                 if verbose:
                     self._logger.warning(f"Episode {episode_path} is lacking data.")
