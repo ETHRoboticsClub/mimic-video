@@ -18,7 +18,6 @@ def _load_episodes_meta(dataset_dir: pathlib.Path) -> pd.DataFrame:
     files = sorted((dataset_dir / "meta" / "episodes").glob("**/file-*.parquet"))
     keep = [
         "episode_index",
-        "tasks",
         "length",
         "data/chunk_index",
         "data/file_index",
@@ -41,11 +40,6 @@ def _load_episodes_meta(dataset_dir: pathlib.Path) -> pd.DataFrame:
     return pd.concat(dfs).reset_index(drop=True).sort_values("episode_index").reset_index(drop=True)
 
 
-def _load_tasks(dataset_dir: pathlib.Path) -> dict[int, str]:
-    df = pq.read_table(dataset_dir / "meta" / "tasks.parquet").to_pandas()
-    # task is in index, task_index is column
-    return {int(row.task_index): str(task) for task, row in df.iterrows()}
-
 
 def _decode_segment(video_path: pathlib.Path, from_ts: float, length: int, fps: int) -> tuple[np.ndarray, int]:
     """Decode a video segment, truncating to actual video length if the request runs past EOF.
@@ -65,6 +59,25 @@ def _decode_segment(video_path: pathlib.Path, from_ts: float, length: int, fps: 
     return vr.get_batch(idx).asnumpy(), effective  # (T, H, W, 3) uint8, T
 
 
+def _assert_zarr_consistent(path: pathlib.Path) -> None:
+    keys = [
+        "joint_action_lowdim",
+        "joint_action_lowdim_timestamps",
+        "joint_state_lowdim",
+        "joint_state_lowdim_timestamps",
+        "workspace_rgb",
+        "workspace_rgb_timestamps",
+        "wrist_rgb_left",
+        "wrist_rgb_left_timestamps",
+        "wrist_rgb_right",
+        "wrist_rgb_right_timestamps",
+    ]
+    with zarr.open(str(path), "r") as root:
+        target_dim = root["joint_action_lowdim"].shape[0]
+        for k in keys:
+            assert root[k].shape[0] == target_dim, f"got bad dims for k {k} and root {path}"
+
+
 def _convert_safe(ep_row, **kwargs):
     """Wrap _convert to catch decord/codec failures so the pool doesn't die."""
     try:
@@ -81,26 +94,7 @@ def _convert(
     out_dir: pathlib.Path,
     fps: int,
     overwrite: bool,
-    tasks: dict[int, str],
 ) -> str:
-    # multi-task: episodes.parquet stores `tasks` as a list of task strings
-    # (one per task this episode covers — typically just 1)
-    ep_tasks = ep_row["tasks"]
-    if isinstance(ep_tasks, str):
-        ep_task_strs = [ep_tasks]
-    elif hasattr(ep_tasks, "__iter__"):
-        ep_task_strs = [str(t) for t in ep_tasks]
-    else:
-        ep_task_strs = [str(ep_tasks)]
-    if len(ep_task_strs) != 1:
-        msg = f"episode {ep_row['episode_index']}: expected exactly 1 task per episode, got {ep_task_strs}"
-        raise ValueError(msg)
-    task_text = ep_task_strs[0]
-    # sanity check: the task string should be one of the known tasks
-    known_task_strs = set(tasks.values())
-    if task_text not in known_task_strs:
-        msg = f"episode {ep_row['episode_index']}: task {task_text!r} not in known tasks {known_task_strs}"
-        raise ValueError(msg)
     ep_idx = int(ep_row["episode_index"])
     out_path = out_dir / f"episode_{ep_idx:04d}.zarr"
     if out_path.exists() and not overwrite:
@@ -116,6 +110,7 @@ def _convert(
     df = table.to_pandas()
     mask = df["episode_index"] == ep_idx
     sub = df.loc[mask].sort_values("frame_index").reset_index(drop=True)
+    task_text = str(sub["task"].iloc[0])
     if len(sub) != length:
         # HF fs26 dataset has occasional mismatch between parquet row count and
         # meta length. Truncate both action/state and video segment to min.
@@ -203,26 +198,7 @@ def _convert(
         "joint_state_lowdim_timestamps", shape=(length,), dtype="uint64", chunks=(length,),
     )[...] = timestamps
 
-
-    # assert
-    target_dim = root['joint_action_lowdim'].shape[0]
-
-    keys = [
-        "joint_action_lowdim",
-        "joint_action_lowdim_timestamps",
-        "joint_state_lowdim",
-        "joint_state_lowdim_timestamps",
-        "workspace_rgb",
-        "workspace_rgb_timestamps",
-        "wrist_rgb_left",
-        "wrist_rgb_left_timestamps",
-        "wrist_rgb_right",
-        "wrist_rgb_right_timestamps",
-    ]
-
-    for k in keys:
-        assert  root[k].shape[0] == target_dim, f'got bad dims for k {k} and root {root.store.path}'
-
+    _assert_zarr_consistent(out_path)
     return f"ok: ep {ep_idx:04d} -> {out_path.name} (T={length})"
 
 
@@ -242,8 +218,6 @@ def main():
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     ep_df = _load_episodes_meta(args.dataset_path)
-    tasks = _load_tasks(args.dataset_path)
-    print(f"loaded {len(tasks)} task(s): {tasks}")
 
     if args.episodes is not None:
         ep_df = ep_df[ep_df["episode_index"].isin(args.episodes)].reset_index(drop=True)
@@ -255,7 +229,6 @@ def main():
         out_dir=args.output_dir,
         fps=args.fps,
         overwrite=args.overwrite,
-        tasks=tasks,
     )
     if args.num_workers <= 1:
         for r in tqdm.tqdm(rows, desc="bi_yams -> zarr"):
