@@ -14,6 +14,7 @@ MASTER_PORT="${MASTER_PORT:-12341}"
 OPTIMIZER="${OPTIMIZER:-fusedadamw}"
 ACTION_ATTN_BACKEND="${ACTION_ATTN_BACKEND:-torch}"
 MAX_VAL_ITER="${MAX_VAL_ITER:-3}"
+GLOBAL_BATCH_SIZE="${GLOBAL_BATCH_SIZE:-4}"
 # ----------
 
 cd "$REPO_ROOT"
@@ -131,4 +132,5 @@ torchrun --nproc_per_node="$NPROC_PER_NODE" --master_port="$MASTER_PORT" -m scri
   world2action_pipe.net.atten_backend="$ACTION_ATTN_BACKEND" \
   model.config.pipe_config.net.atten_backend="$ACTION_ATTN_BACKEND" \
   trainer.max_val_iter="$MAX_VAL_ITER" \
+  dataloader_train.batch_size.global_bsz="$GLOBAL_BATCH_SIZE" \
   model.config.video_dit_path="$VIDEO_CKPT"
