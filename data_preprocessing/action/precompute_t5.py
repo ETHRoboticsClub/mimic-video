@@ -47,11 +47,14 @@ def main():
     args = p.parse_args()
 
     encoder_config = CosmosT5TextEncoderConfig(ckpt_path=T5_MODEL_DIR)
+    print(f"Loading T5 text encoder from {T5_MODEL_DIR}. This can take several minutes.", flush=True)
     encoder = CosmosT5TextEncoder(config=encoder_config)
+    print("T5 text encoder loaded.", flush=True)
 
     embedding = args.prompt and encoder.encode_prompts(args.prompt, max_length=512, return_mask=False).cpu().numpy()
 
     for dataset in args.dataset_path:
+        print(f"Precomputing language embeddings for {dataset}.", flush=True)
         paths = pathlib.Path(dataset).glob("**/*.zarr")
 
         for path in tqdm.tqdm(paths, desc="Precomputing language embeddings."):
