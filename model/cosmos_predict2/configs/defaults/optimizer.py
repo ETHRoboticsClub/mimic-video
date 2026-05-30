@@ -31,7 +31,17 @@ FusedAdamWConfig: LazyDict[torch.optim.Optimizer] = L(get_base_optimizer)(
     capturable=True,
 )
 
+AdamWConfig: LazyDict[torch.optim.Optimizer] = L(get_base_optimizer)(
+    model=PLACEHOLDER,
+    lr=1e-4,
+    weight_decay=0.1,
+    betas=[0.9, 0.99],
+    optim_type="adamw",
+    eps=1e-8,
+)
+
 
 def register_optimizer():
     cs = ConfigStore.instance()
     cs.store(group="optimizer", package="optimizer", name="fusedadamw", node=FusedAdamWConfig)
+    cs.store(group="optimizer", package="optimizer", name="adamw", node=AdamWConfig)

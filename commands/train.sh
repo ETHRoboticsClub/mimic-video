@@ -11,6 +11,7 @@ EXPERIMENT="${EXPERIMENT:-w2a_yams_v2w_pretrained_cosmos_lr1.000e-04_layer20_bsz
 VIDEO_CKPT="${VIDEO_CKPT:-checkpoints/video_backbone/cosmos-predict2_v2w_480p_10fps.pt}"
 NPROC_PER_NODE="${NPROC_PER_NODE:-1}"
 MASTER_PORT="${MASTER_PORT:-12341}"
+OPTIMIZER="${OPTIMIZER:-fusedadamw}"
 # ----------
 
 cd "$REPO_ROOT"
@@ -46,6 +47,24 @@ fi
 if [[ ! -f "$VIDEO_CKPT" ]]; then
   echo "ERROR: VIDEO_CKPT does not exist: $VIDEO_CKPT" >&2
   exit 1
+fi
+
+if [[ "$OPTIMIZER" == "fusedadamw" ]]; then
+  if ! python - <<'PY' >/dev/null 2>&1
+from apex.multi_tensor_apply import multi_tensor_applier  # noqa: F401
+PY
+  then
+    cat >&2 <<'EOF'
+ERROR: OPTIMIZER=fusedadamw requires NVIDIA Apex, but apex.multi_tensor_apply is not importable.
+
+Install the CUDA 12.8 extras into this environment:
+  cd model && uv sync --extra cu128
+
+Or use the slower PyTorch optimizer for this run:
+  OPTIMIZER=adamw ./commands/train.sh
+EOF
+    exit 1
+  fi
 fi
 
 DATA_DIR="$DATA_DIR" python - <<'PY'
@@ -105,5 +124,6 @@ NVTE_FUSED_ATTN="${NVTE_FUSED_ATTN:-0}" \
 torchrun --nproc_per_node="$NPROC_PER_NODE" --master_port="$MASTER_PORT" -m scripts.train \
   --config=cosmos_predict2/configs/config.py \
   -- experiment="$EXPERIMENT" \
+  optimizer="$OPTIMIZER" \
   data_config.dataset.dataset.data_dir="$DATA_DIR" \
   model.config.video_dit_path="$VIDEO_CKPT"

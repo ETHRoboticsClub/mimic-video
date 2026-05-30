@@ -17,7 +17,6 @@ import torch
 from omegaconf import ListConfig
 from torch import nn
 
-from cosmos_predict2.utils.fused_adam_dtensor import FusedAdam
 from imaginaire.utils import log
 
 
@@ -59,6 +58,8 @@ def get_base_optimizer(
     if optim_type == "adamw":
         opt_cls = torch.optim.AdamW
     elif optim_type == "fusedadam":
+        from cosmos_predict2.utils.fused_adam_dtensor import FusedAdam
+
         opt_cls = FusedAdam
     else:
         raise ValueError(f"Unknown optimizer type: {optim_type}")
