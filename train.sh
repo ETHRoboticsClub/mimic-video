@@ -34,7 +34,6 @@ CUDA_DEVICE_MAX_CONNECTIONS="${CUDA_DEVICE_MAX_CONNECTIONS:-1}" \
 NVTE_FUSED_ATTN="${NVTE_FUSED_ATTN:-0}" \
 NVTE_FLASH_ATTN="${NVTE_FLASH_ATTN:-0}" \
 NCCL_P2P_DISABLE="${NCCL_P2P_DISABLE:-1}" \
-WANDB_API_KEY="${WANDB_API_KEY:-}" \
 torchrun --nproc_per_node="${NPROC_PER_NODE}" --master_port="${MASTER_PORT}" -m scripts.train \
     --config=cosmos_predict2/configs/config.py \
     -- "${OVERRIDES[@]}"
