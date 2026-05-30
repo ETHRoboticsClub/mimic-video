@@ -82,11 +82,14 @@ def get_local_batch_size(global_bsz: int) -> int:
 for video_ckpt, data_config, xattn_layer_idx, lr, bsz in it.product(
     VIDEO_MODEL_CKPT_NAMES, DATA_CONFIGS.keys(), xattn_layer_idxs, lrs, bszs
 ):
-    pipes = [pipe for pipe in world2action_pipes if data_config.startswith(pipe)]
+    pipes = [
+        pipe
+        for pipe in world2action_pipes
+        if data_config == pipe or data_config.startswith(f"{pipe}_")
+    ]
+    pipes = sorted(pipes, key=len, reverse=True)
     if not pipes:
         continue
-    if len(pipes) > 1:
-        raise AssertionError("data_config to pipe should be n-to-1")
     pipe = pipes[0]
 
     exp_name = f"w2a_{data_config}_{video_ckpt}_lr{lr:.3e}_layer{xattn_layer_idx}_bsz{bsz}"

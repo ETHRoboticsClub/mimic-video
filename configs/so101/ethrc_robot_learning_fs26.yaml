@@ -1,0 +1,23 @@
+preprocessing:
+  source:
+    repo_id: ETHRC/robot-learning-fs26
+    revision: main
+  text_encoder:
+    model_id: google-t5/t5-large
+    revision: main
+  instruction: perform the task
+  video_feature: observation.images.top
+  exclude_episodes: []
+  image:
+    crop_xywh: [0, 0, 640, 480]
+    output_size_hw: [480, 640]
+  contact_sheet:
+    enabled: true
+  force: false
+
+training:
+  video_finetune:
+    enabled: false
+  action_decoder:
+    enabled: false
+    experiment: so101_14
