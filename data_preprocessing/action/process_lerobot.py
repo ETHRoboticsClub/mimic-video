@@ -203,6 +203,26 @@ def _convert(
         "joint_state_lowdim_timestamps", shape=(length,), dtype="uint64", chunks=(length,),
     )[...] = timestamps
 
+
+    # assert
+    target_dim = root['joint_action_lowdim'].shape[0]
+
+    keys = [
+        "joint_action_lowdim",
+        "joint_action_lowdim_timestamps",
+        "joint_state_lowdim",
+        "joint_state_lowdim_timestamps",
+        "workspace_rgb",
+        "workspace_rgb_timestamps",
+        "wrist_rgb_left",
+        "wrist_rgb_left_timestamps",
+        "wrist_rgb_right",
+        "wrist_rgb_right_timestamps",
+    ]
+
+    for k in keys:
+        assert  root[k].shape[0] == target_dim, f'got bad dims for k {k} and root {root.store.path}'
+
     return f"ok: ep {ep_idx:04d} -> {out_path.name} (T={length})"
 
 
