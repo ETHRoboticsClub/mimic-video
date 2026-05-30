@@ -4,7 +4,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # User variables
 # ----------
 HF_ORG="ETHRC"
-HF_REPO="robot-learning-fs26"
+HF_REPO="yams-carton-box-closing-fri-tom-mat-varing-fan-position"
 DOWNLOAD_ROOT="$REPO_ROOT/data/hf_datasets/$HF_REPO"
 # ----------
 
