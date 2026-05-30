@@ -247,6 +247,7 @@ class ChunkReader:
             try:
                 values = root[key][start_idx + start_offset : start_idx + indices.max() + 1][indices - start_offset]
             except Exception:
+                print('root path', root.store.path)
                 print(f'key={key!r}')
                 print(f'start_idx={start_idx}')
                 print(f'start_offset={start_offset}')
