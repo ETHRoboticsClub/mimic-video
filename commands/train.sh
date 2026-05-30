@@ -38,9 +38,64 @@ if [[ ! -d "$DATA_DIR" ]]; then
   exit 1
 fi
 
-if ! find "$DATA_DIR" -maxdepth 2 -type d -name language_embedding -print -quit | grep -q .; then
-  echo "ERROR: DATA_DIR is missing language_embedding arrays." >&2
-  echo "Run: DATA_DIR=\"$DATA_DIR\" bash commands/langauge_embeds.sh" >&2
+if [[ ! "$EXPERIMENT" == w2a_yams_* ]]; then
+  echo "ERROR: EXPERIMENT must use the YAMS data_config, got: $EXPERIMENT" >&2
+  exit 1
+fi
+
+if [[ ! -f "$VIDEO_CKPT" ]]; then
+  echo "ERROR: VIDEO_CKPT does not exist: $VIDEO_CKPT" >&2
+  exit 1
+fi
+
+DATA_DIR="$DATA_DIR" python - <<'PY'
+import os
+from pathlib import Path
+
+import zarr
+
+data_dir = Path(os.environ["DATA_DIR"]).expanduser()
+episodes = sorted(data_dir.glob("episode_*.zarr"))
+if len(episodes) < 3:
+    raise SystemExit(f"ERROR: need at least 3 episodes for 2 validation episodes + training, found {len(episodes)}")
+
+required = {
+    "workspace_rgb",
+    "workspace_rgb_timestamps",
+    "joint_state_lowdim",
+    "joint_state_lowdim_timestamps",
+    "joint_action_lowdim",
+    "joint_action_lowdim_timestamps",
+    "language_embedding",
+    "language_embedding_timestamps",
+}
+
+for episode in episodes:
+    root = zarr.open(str(episode), mode="r")
+    missing = sorted(required.difference(root.array_keys()))
+    if missing:
+        hint = ""
+        if "language_embedding" in missing:
+            hint = f'\nRun: DATA_DIR="{data_dir}" bash commands/langauge_embeds.sh'
+        raise SystemExit(f"ERROR: {episode} missing arrays: {missing}{hint}")
+
+    length = root["workspace_rgb"].shape[0]
+    checks = {
+        "workspace_rgb_timestamps": (length,),
+        "joint_state_lowdim": (length, 14),
+        "joint_state_lowdim_timestamps": (length,),
+        "joint_action_lowdim": (length, 14),
+        "joint_action_lowdim_timestamps": (length,),
+        "language_embedding": (1, 512, 1024),
+        "language_embedding_timestamps": (1,),
+    }
+    for key, expected in checks.items():
+        actual = root[key].shape
+        if actual != expected:
+            raise SystemExit(f"ERROR: {episode}/{key} shape {actual} != expected {expected}")
+PY
+
+if [[ $? -ne 0 ]]; then
   exit 1
 fi
 
