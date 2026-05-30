@@ -260,8 +260,19 @@ class ChunkReader:
             else:
                 indices = get_closest_indices(actual_timestamps, requested_timestamps)
             start_offset = indices.min()
-            values = root[key][start_idx + start_offset : start_idx + indices.max() + 1][indices - start_offset]
-
+            try:
+                values = root[key][start_idx + start_offset : start_idx + indices.max() + 1][indices - start_offset]
+            except Exception:
+                print(f'key={key!r}')
+                print(f'start_idx={start_idx}')
+                print(f'start_offset={start_offset}')
+                print(f'indices={indices}')
+                print(f'indices.min()={indices.min()}')
+                print(f'indices.max()={indices.max()}')
+                print(f'slice start={start_idx + start_offset}  slice stop={start_idx + indices.max() + 1}')
+                print(f'indices - start_offset={indices - start_offset}')
+                print(f'root[key] shape={root[key].shape}')
+                raise Exception('index error')
         if values.ndim == 1 and values.dtype != np.object_:
             values = values[:, None]
 
