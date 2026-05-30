@@ -1,6 +1,8 @@
-cd ~/mimic-video/model
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+cd "$REPO_ROOT/model"
 source .venv/bin/activate
 
-python scripts/download_checkpoints.py \
-  --models pretrained_cosmos_bridge \
-  --checkpoint-dir checkpoints
+hf download jonpai/mimic-video \
+  --include "text_encoder/t5-11b/*" \
+  --local-dir checkpoints
