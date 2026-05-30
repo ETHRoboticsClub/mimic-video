@@ -12,19 +12,15 @@ import zarr
 
 CAMS = {
     "workspace_rgb": "observation.images.topdown",
-    "wrist_rgb_left": "observation.images.left_wrist",
-    "wrist_rgb_right": "observation.images.right_wrist",
 }
 
 ZARR_LENGTH_KEYS = [
     "workspace_rgb",
     "workspace_rgb_timestamps",
-    "wrist_rgb_left",
-    "wrist_rgb_left_timestamps",
-    "wrist_rgb_right",
-    "wrist_rgb_right_timestamps",
     "joint_state_lowdim",
     "joint_state_lowdim_timestamps",
+    "joint_action_lowdim",
+    "joint_action_lowdim_timestamps",
 ]
 
 
@@ -212,18 +208,19 @@ def check_episode(
         if zarr_length != expected_length:
             messages.append(f"zarr length {zarr_length} != expected source/action/video length {expected_length}")
 
-    for image_key in ("workspace_rgb", "wrist_rgb_left", "wrist_rgb_right"):
+    for image_key in CAMS:
         if image_key in root and root[image_key].shape[1:] != (480, 640, 3):
             messages.append(f"{image_key} shape {root[image_key].shape} has unexpected image dimensions")
     if "joint_state_lowdim" in root and root["joint_state_lowdim"].shape[1:] != (14,):
         messages.append(f"joint_state_lowdim shape {root['joint_state_lowdim'].shape} does not have 14 joints")
+    if "joint_action_lowdim" in root and root["joint_action_lowdim"].shape[1:] != (14,):
+        messages.append(f"joint_action_lowdim shape {root['joint_action_lowdim'].shape} does not have 14 joints")
 
     if zarr_length is not None:
         for key in (
             "workspace_rgb_timestamps",
-            "wrist_rgb_left_timestamps",
-            "wrist_rgb_right_timestamps",
             "joint_state_lowdim_timestamps",
+            "joint_action_lowdim_timestamps",
         ):
             if key in root:
                 _check_timestamps(root, key, zarr_length, messages)

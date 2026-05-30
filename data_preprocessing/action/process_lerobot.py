@@ -124,15 +124,15 @@ def _convert(
         sub = sub.head(effective).reset_index(drop=True)
         length = effective
 
-    # state is fixed_size_list[14]; pyarrow->pandas yields ndarray-of-lists
+    # state/action are fixed_size_list[14]; pyarrow->pandas yields ndarray-of-lists
     state = np.stack(sub["observation.state"].to_numpy()).astype(np.float32)
     assert state.shape == (length, 14), state.shape
+    action = np.stack(sub["action"].to_numpy()).astype(np.float32)
+    assert action.shape == (length, 14), action.shape
 
-    # videos
+    # videos. Train ingestion currently uses only topdown/workspace_rgb.
     cams = {
         "workspace_rgb": "observation.images.topdown",
-        "wrist_rgb_left": "observation.images.left_wrist",
-        "wrist_rgb_right": "observation.images.right_wrist",
     }
     decoded = {}
     effective_lengths = []
@@ -151,6 +151,7 @@ def _convert(
         for out_key in list(decoded.keys()):
             decoded[out_key] = decoded[out_key][:min_eff]
         state = state[:min_eff]
+        action = action[:min_eff]
         sub = sub.head(min_eff).reset_index(drop=True)
         length = min_eff
 
@@ -194,13 +195,20 @@ def _convert(
             f"{out_key}_timestamps", shape=(length,), dtype="uint64", chunks=(length,),
         )[...] = timestamps
 
-    # 14-dim joints
+    # 14-dim bimanual joints and actions
     root.create_dataset(
         "joint_state_lowdim", shape=state.shape, dtype=np.float32,
         chunks=(t_ld, state.shape[1]), compressor=comp,
     )[...] = state
     root.create_dataset(
         "joint_state_lowdim_timestamps", shape=(length,), dtype="uint64", chunks=(length,),
+    )[...] = timestamps
+    root.create_dataset(
+        "joint_action_lowdim", shape=action.shape, dtype=np.float32,
+        chunks=(t_ld, action.shape[1]), compressor=comp,
+    )[...] = action
+    root.create_dataset(
+        "joint_action_lowdim_timestamps", shape=(length,), dtype="uint64", chunks=(length,),
     )[...] = timestamps
 
     return f"ok: ep {ep_idx:04d} -> {out_path.name} (T={length})"

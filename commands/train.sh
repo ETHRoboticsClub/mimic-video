@@ -38,6 +38,12 @@ if [[ ! -d "$DATA_DIR" ]]; then
   exit 1
 fi
 
+if ! find "$DATA_DIR" -maxdepth 2 -type d -name language_embedding -print -quit | grep -q .; then
+  echo "ERROR: DATA_DIR is missing language_embedding arrays." >&2
+  echo "Run: DATA_DIR=\"$DATA_DIR\" bash commands/langauge_embeds.sh" >&2
+  exit 1
+fi
+
 TORCH_NCCL_HEARTBEAT_TIMEOUT_SEC="${TORCH_NCCL_HEARTBEAT_TIMEOUT_SEC:-7200}" \
 CUDA_DEVICE_MAX_CONNECTIONS="${CUDA_DEVICE_MAX_CONNECTIONS:-1}" \
 NVTE_FUSED_ATTN="${NVTE_FUSED_ATTN:-0}" \

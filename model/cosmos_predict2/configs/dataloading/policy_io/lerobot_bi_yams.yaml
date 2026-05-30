@@ -8,7 +8,7 @@ policy_io:
       target_repr: null
       target_frequency: 5
       shift_right_by: 0.2
-    joint_state_lowdim:
+    joint_action_lowdim:
       horizon: 15
       normalization_type: ${NormalizationType:VARIANCE}
       target_repr: ${LieRepr:ABSOLUTE}
@@ -37,7 +37,7 @@ policy_io:
 
 concat_groups:
   action/lowdim_concat:
-    - action/joint_state_lowdim
+    - action/joint_action_lowdim
 
   obs/lowdim_concat:
     - obs/joint_state_lowdim
