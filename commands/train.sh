@@ -7,11 +7,10 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # User variables
 # ----------
 DATA_DIR="${DATA_DIR:-$REPO_ROOT/data/zarr_yams-carton-box-closing-fri-tom-mat-varing-fan-position}"
-EXPERIMENT="${EXPERIMENT:-w2a_bridge_v2w_pretrained_cosmos_lr1.000e-04_layer20_bsz128}"
+EXPERIMENT="${EXPERIMENT:-w2a_yams_v2w_pretrained_cosmos_lr1.000e-04_layer20_bsz1}"
 VIDEO_CKPT="${VIDEO_CKPT:-checkpoints/video_backbone/cosmos-predict2_v2w_480p_10fps.pt}"
 NPROC_PER_NODE="${NPROC_PER_NODE:-1}"
 MASTER_PORT="${MASTER_PORT:-12341}"
-UV_CACHE_DIR="${UV_CACHE_DIR:-/mnt/data/uv-cache}"
 # ----------
 
 cd "$REPO_ROOT"
@@ -22,10 +21,11 @@ if [[ -f ".env" ]]; then
   set +a
 fi
 
-mkdir -p "$UV_CACHE_DIR"
-
 cd "$REPO_ROOT/model"
-UV_CACHE_DIR="$UV_CACHE_DIR" uv sync --extra cu128
+if [[ ! -f ".venv/bin/activate" ]]; then
+  echo "ERROR: model/.venv does not exist. Create it first with: cd model && uv sync --extra cu128" >&2
+  exit 1
+fi
 source .venv/bin/activate
 
 if ! command -v nvidia-smi >/dev/null 2>&1; then
