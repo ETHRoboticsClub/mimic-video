@@ -52,6 +52,7 @@ dependencies = [
   "ipdb==0.13.13",
   "ipykernel>=7.2.0",
   "loguru==0.7.3",
+  "mcap==1.3.0",
   "mediapy==1.2.4",
   "megatron-core==0.12.1",
   "modelscope==1.26.0",
