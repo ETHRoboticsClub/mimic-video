@@ -6,6 +6,11 @@ OUTPUT_DIR="${OUTPUT_DIR:-data/teleop_converted}"
 MAX_SYNC_MS="${MAX_SYNC_MS:-50}"
 NUM_WORKERS="${NUM_WORKERS:-1}"
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+cd "${REPO_ROOT}"
+
 PYTHONPATH=. uv run --project model python data_preprocessing/action/process_recordings.py \
   --input-dir "${INPUT_DIR}" \
   --output-dir "${OUTPUT_DIR}" \

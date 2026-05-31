@@ -9,7 +9,7 @@ NUM_VAL_EPISODES="${NUM_VAL_EPISODES:-0}"
 RUN_VALIDATION="${RUN_VALIDATION:-false}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 DATA_DIR="${DATA_DIR:-${REPO_ROOT}/data/teleop_converted}"
 TORCHRUN="${TORCHRUN:-${REPO_ROOT}/model/.venv/bin/torchrun}"
 
