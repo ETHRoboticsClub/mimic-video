@@ -100,6 +100,7 @@ def create_recordings_fixture(
                     {"name": "yam_right", "published_topics": ["joint_state"]},
                 ],
                 "record_topic": "gello_left/record",
+                "instruction": _INSTRUCTION,
             }
         )
     )
@@ -128,7 +129,6 @@ def test_happy_path_schema_shapes_language_and_attrs(tmp_path: pathlib.Path):
             episode_dir=fixture["episode_dir"],
             episode_index=0,
             output_dir=out_dir,
-            instruction=_INSTRUCTION,
             max_sync_ms=50,
             overwrite=True,
             dry_run=False,
@@ -170,7 +170,7 @@ def test_joint_streams_concatenate_left_then_right(tmp_path: pathlib.Path):
     from data_preprocessing.action.process_recordings import ConversionTask, convert_episode
 
     convert_episode(
-        ConversionTask(fixture["episode_dir"], 0, out_dir, _INSTRUCTION, 50, True, False)
+        ConversionTask(fixture["episode_dir"], 0, out_dir, 50, True, False)
     )
     z = zarr_pkg.open(str(out_dir / "episode_0000.zarr"))
     expected = np.concatenate([fixture["left_joints"][:_N], fixture["right_joints"][:_N]], axis=1)
@@ -185,7 +185,7 @@ def test_frame_count_mismatch_aligns_to_top_timeline(tmp_path: pathlib.Path):
     from data_preprocessing.action.process_recordings import ConversionTask, convert_episode
 
     msg = convert_episode(
-        ConversionTask(fixture["episode_dir"], 0, out_dir, _INSTRUCTION, 50, True, False)
+        ConversionTask(fixture["episode_dir"], 0, out_dir, 50, True, False)
     )
     assert "(T=5" in msg
     z = zarr_pkg.open(str(out_dir / "episode_0000.zarr"))
@@ -201,7 +201,7 @@ def test_sync_threshold_drops_far_frames(tmp_path: pathlib.Path):
     from data_preprocessing.action.process_recordings import ConversionTask, convert_episode
 
     try:
-        convert_episode(ConversionTask(fixture["episode_dir"], 0, out_dir, _INSTRUCTION, 1, True, False))
+        convert_episode(ConversionTask(fixture["episode_dir"], 0, out_dir, 1, True, False))
     except ValueError as exc:
         assert "no frames remained" in str(exc)
     else:
@@ -221,6 +221,23 @@ def test_missing_required_files_fail_clearly(tmp_path: pathlib.Path):
         raise AssertionError("expected missing file error")
 
 
+def test_missing_session_instruction_fails_clearly(tmp_path: pathlib.Path):
+    fixture = create_recordings_fixture(tmp_path)
+    meta_path = fixture["episode_dir"] / "session_meta.json"
+    meta = json.loads(meta_path.read_text())
+    del meta["instruction"]
+    meta_path.write_text(json.dumps(meta))
+
+    from data_preprocessing.action.process_recordings import load_session_instruction
+
+    try:
+        load_session_instruction(fixture["episode_dir"])
+    except ValueError as exc:
+        assert "instruction" in str(exc)
+    else:
+        raise AssertionError("expected missing instruction error")
+
+
 def test_skip_overwrite_and_dry_run(tmp_path: pathlib.Path):
     fixture = create_recordings_fixture(tmp_path)
     out_dir = tmp_path / "out"
@@ -228,14 +245,14 @@ def test_skip_overwrite_and_dry_run(tmp_path: pathlib.Path):
 
     from data_preprocessing.action.process_recordings import ConversionTask, convert_episode
 
-    task = ConversionTask(fixture["episode_dir"], 0, out_dir, _INSTRUCTION, 50, True, False)
+    task = ConversionTask(fixture["episode_dir"], 0, out_dir, 50, True, False)
     assert convert_episode(task).startswith("ok:")
-    skip_task = ConversionTask(fixture["episode_dir"], 0, out_dir, _INSTRUCTION, 50, False, False)
+    skip_task = ConversionTask(fixture["episode_dir"], 0, out_dir, 50, False, False)
     assert convert_episode(skip_task).startswith("skip (exists):")
 
     dry_out = tmp_path / "dry"
     dry_out.mkdir()
-    dry_task = ConversionTask(fixture["episode_dir"], 0, dry_out, _INSTRUCTION, 50, False, True)
+    dry_task = ConversionTask(fixture["episode_dir"], 0, dry_out, 50, False, True)
     assert convert_episode(dry_task).startswith("dry-run ok:")
     assert not (dry_out / "episode_0000.zarr").exists()
 
@@ -253,8 +270,6 @@ def test_cli_smoke(tmp_path: pathlib.Path):
             str(fixture["episode_dir"].parents[1]),
             "--output-dir",
             str(out_dir),
-            "--instruction",
-            _INSTRUCTION,
             "--episodes",
             "0",
             "--overwrite",
@@ -284,8 +299,6 @@ def test_dry_run_cli_creates_no_zarr(tmp_path: pathlib.Path):
             str(fixture["episode_dir"].parents[1]),
             "--output-dir",
             str(out_dir),
-            "--instruction",
-            _INSTRUCTION,
             "--dry-run",
         ],
         capture_output=True,

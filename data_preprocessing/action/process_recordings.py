@@ -54,7 +54,6 @@ class ConversionTask:
     episode_dir: pathlib.Path
     episode_index: int
     output_dir: pathlib.Path
-    instruction: str
     max_sync_ms: float
     overwrite: bool
     dry_run: bool
@@ -93,6 +92,17 @@ def validate_required_files(episode_dir: pathlib.Path) -> None:
     missing = [name for name in REQUIRED_FILES if not (episode_dir / name).exists()]
     if missing:
         raise FileNotFoundError(f"{episode_dir.name}: missing required files: {missing}")
+
+
+def load_session_instruction(episode_dir: pathlib.Path) -> str:
+    meta_path = episode_dir / "session_meta.json"
+    with meta_path.open("r", encoding="utf-8") as stream:
+        meta = json.load(stream)
+
+    instruction = meta.get("instruction")
+    if not isinstance(instruction, str) or not instruction.strip():
+        raise ValueError(f"{episode_dir.name}: session_meta.json must contain a non-empty 'instruction' string")
+    return instruction.strip()
 
 
 def load_camera_timestamps(episode_dir: pathlib.Path, camera: str) -> np.ndarray:
@@ -314,6 +324,7 @@ def convert_episode(task: ConversionTask) -> str:
         return f"skip (exists): {out_path}"
 
     validate_required_files(task.episode_dir)
+    instruction = load_session_instruction(task.episode_dir)
     if task.dry_run:
         return f"dry-run ok: {task.episode_dir.name} -> {out_path.name}"
 
@@ -322,7 +333,7 @@ def convert_episode(task: ConversionTask) -> str:
         out_path,
         aligned,
         source_episode=task.episode_dir,
-        instruction=task.instruction,
+        instruction=instruction,
         max_sync_ms=task.max_sync_ms,
         overwrite=task.overwrite,
     )
@@ -338,7 +349,6 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Convert raw teleop recordings to lerobot_bi_yams zarr episodes.")
     parser.add_argument("--input-dir", type=pathlib.Path, required=True, help="Root containing date/episode_* folders.")
     parser.add_argument("--output-dir", type=pathlib.Path, required=True, help="Directory to write episode_*.zarr files.")
-    parser.add_argument("--instruction", required=True, help="Language instruction to store for every episode.")
     parser.add_argument("--max-sync-ms", type=float, default=50.0, help="Maximum nearest-neighbor sync gap in ms.")
     parser.add_argument("--num-workers", type=int, default=1)
     parser.add_argument("--overwrite", action="store_true")
@@ -360,7 +370,6 @@ def main() -> None:
             episode_dir=episode_dir,
             episode_index=episode_index,
             output_dir=args.output_dir,
-            instruction=args.instruction,
             max_sync_ms=args.max_sync_ms,
             overwrite=args.overwrite,
             dry_run=args.dry_run,
