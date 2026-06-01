@@ -11,6 +11,10 @@ from imaginaire.auxiliary.text_encoder import CosmosT5TextEncoder, CosmosT5TextE
 from imaginaire.constants import T5_MODEL_DIR
 
 
+def log(message: str) -> None:
+    print(f"[precompute_t5] {message}", flush=True)
+
+
 def load_instruction(path: pathlib.Path, source: str) -> str:
     root: zarr.Group
     with zarr.open(str(path), "r") as root:
@@ -29,11 +33,15 @@ def encode_prompt(encoder: CosmosT5TextEncoder, prompt: str) -> np.ndarray:
 
 def load_embedding_cache(cache_path: pathlib.Path | None) -> dict[str, np.ndarray]:
     if cache_path is None or not cache_path.exists():
+        if cache_path is not None:
+            log(f"no embedding cache found at {cache_path}; starting a new cache")
         return {}
+    log(f"loading embedding cache from {cache_path}")
     with cache_path.open("rb") as stream:
         cache = pickle.load(stream)
     if not isinstance(cache, dict):
         raise ValueError(f"{cache_path}: expected a dict cache keyed by instruction")
+    log(f"loaded {len(cache)} cached instruction embeddings")
     return cache
 
 
@@ -79,16 +87,23 @@ def precompute_dataset(
     prompt_override: str | None,
 ) -> None:
     paths = sorted(pathlib.Path(dataset).glob("**/*.zarr"))
+    log(f"found {len(paths)} zarr episodes under {dataset}")
 
     if prompt_override:
+        log("encoding prompt override once")
         prompt_embedding = encode_prompt(encoder, prompt_override)
         for path in tqdm.tqdm(paths, desc="Writing language embeddings."):
             add_t5(path, prompt_embedding)
         return
 
+    log(f"reading instructions from {instruction_source}")
     instructions_by_path = {path: load_instruction(path, instruction_source) for path in paths}
     unique_instructions = sorted(set(instructions_by_path.values()))
     missing_instructions = [instruction for instruction in unique_instructions if instruction not in cache]
+    log(
+        f"found {len(unique_instructions)} unique instructions "
+        f"({len(missing_instructions)} missing from cache)"
+    )
 
     for instruction in tqdm.tqdm(missing_instructions, desc="Encoding unique instructions."):
         cache[instruction] = encode_prompt(encoder, instruction)
@@ -113,8 +128,11 @@ def main():
     p.add_argument("--cache-path", type=pathlib.Path, help="Optional pickle cache keyed by instruction text.")
     args = p.parse_args()
 
+    log(f"using T5 checkpoint directory: {T5_MODEL_DIR}")
+    log("loading T5 text encoder; this can take a while")
     encoder_config = CosmosT5TextEncoderConfig(ckpt_path=T5_MODEL_DIR)
     encoder = CosmosT5TextEncoder(config=encoder_config)
+    log("loaded T5 text encoder")
 
     cache = load_embedding_cache(args.cache_path)
 
