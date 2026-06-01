@@ -17,6 +17,15 @@ run_step() {
 }
 
 detect_gpu_count() {
+  if [[ -n "${CUDA_VISIBLE_DEVICES:-}" ]]; then
+    if [[ "${CUDA_VISIBLE_DEVICES}" == "-1" || "${CUDA_VISIBLE_DEVICES}" == "NoDevFiles" ]]; then
+      echo "0"
+      return
+    fi
+    awk -F, '{ print NF }' <<<"${CUDA_VISIBLE_DEVICES}"
+    return
+  fi
+
   if command -v nvidia-smi >/dev/null 2>&1; then
     nvidia-smi --query-gpu=name --format=csv,noheader | wc -l | tr -d '[:space:]'
     return
@@ -69,6 +78,14 @@ recommend_preprocess_workers() {
   echo "${workers}"
 }
 
+default_frozen_checkpoint_dir() {
+  if [[ -d /opt/dlami/nvme && -w /opt/dlami/nvme ]]; then
+    echo "/opt/dlami/nvme/mimic-video-cache/checkpoints"
+    return
+  fi
+  echo "${REPO_ROOT}/model/checkpoints"
+}
+
 cd "${REPO_ROOT}"
 
 if [[ -f ".env" ]]; then
@@ -83,6 +100,13 @@ if ! [[ "${NPROC_PER_NODE}" =~ ^[0-9]+$ ]] || [[ "${NPROC_PER_NODE}" -lt 1 ]]; t
   exit 1
 fi
 log "detected ${NPROC_PER_NODE} GPU(s); training will use NPROC_PER_NODE=${NPROC_PER_NODE}"
+
+export FROZEN_CHECKPOINT_DIR="${FROZEN_CHECKPOINT_DIR:-$(default_frozen_checkpoint_dir)}"
+export CHECKPOINT_DIR="${CHECKPOINT_DIR:-${FROZEN_CHECKPOINT_DIR}}"
+export CHECKPOINT_PATH="${CHECKPOINT_PATH:-${FROZEN_CHECKPOINT_DIR}/video_backbone/cosmos-predict2_v2w_480p_10fps.pt}"
+export VIDEO_CKPT="${VIDEO_CKPT:-${CHECKPOINT_PATH}}"
+export COSMOS_PREDICT2_ARGS="${COSMOS_PREDICT2_ARGS:---checkpoints ${FROZEN_CHECKPOINT_DIR}}"
+log "frozen checkpoints dir: ${FROZEN_CHECKPOINT_DIR}"
 
 CPU_COUNT="$(detect_cpu_count)"
 MEM_GIB="$(detect_mem_gib)"

@@ -9,12 +9,18 @@ fi
 
 CACHE_PATH="${CACHE_PATH:-${DATASET_PATH}/t5_instruction_cache.pkl}"
 UV_RUN_ARGS="${UV_RUN_ARGS:---extra cu128}"
+FROZEN_CHECKPOINT_DIR="${FROZEN_CHECKPOINT_DIR:-}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 cd "${REPO_ROOT}"
 
+if [[ -n "${FROZEN_CHECKPOINT_DIR}" ]]; then
+  COSMOS_PREDICT2_ARGS="${COSMOS_PREDICT2_ARGS:---checkpoints ${FROZEN_CHECKPOINT_DIR}}"
+fi
+
+COSMOS_PREDICT2_ARGS="${COSMOS_PREDICT2_ARGS:-}" \
 PYTHONPATH=model:. uv run --project model ${UV_RUN_ARGS} python data_preprocessing/action/precompute_t5.py \
   --dataset-path "${DATASET_PATH}" \
   --instruction-source attrs \

@@ -2,11 +2,13 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CHECKPOINT_DIR="$REPO_ROOT/model/checkpoints"
+CHECKPOINT_DIR="${CHECKPOINT_DIR:-${FROZEN_CHECKPOINT_DIR:-$REPO_ROOT/model/checkpoints}}"
 T5_DIR="$CHECKPOINT_DIR/text_encoder/t5-11b"
 
 cd "$REPO_ROOT/model"
 source .venv/bin/activate
+
+mkdir -p "$CHECKPOINT_DIR"
 
 echo "Downloading T5-11B text encoder to $T5_DIR"
 if [[ -f "$T5_DIR/pytorch_model.bin" ]]; then

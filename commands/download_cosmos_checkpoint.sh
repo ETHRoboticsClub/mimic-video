@@ -3,9 +3,6 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-S3_URI="${S3_URI:-s3://ethrc-ml-data-916780037007/robot-learning/checkpoints/cosmos/iter_000007000_fused.pt}"
-CHECKPOINT_PATH="${CHECKPOINT_PATH:-$REPO_ROOT/model/checkpoints/video_backbone/cosmos-predict2_v2w_480p_10fps.pt}"
-
 cd "$REPO_ROOT"
 
 if [[ -f ".env" ]]; then
@@ -13,6 +10,10 @@ if [[ -f ".env" ]]; then
   source ".env"
   set +a
 fi
+
+CHECKPOINT_DIR="${CHECKPOINT_DIR:-${FROZEN_CHECKPOINT_DIR:-$REPO_ROOT/model/checkpoints}}"
+S3_URI="${S3_URI:-s3://ethrc-ml-data-916780037007/robot-learning/checkpoints/cosmos/iter_000007000_fused.pt}"
+CHECKPOINT_PATH="${CHECKPOINT_PATH:-$CHECKPOINT_DIR/video_backbone/cosmos-predict2_v2w_480p_10fps.pt}"
 
 if ! command -v aws >/dev/null 2>&1; then
   echo "ERROR: aws CLI is not installed or not on PATH." >&2
