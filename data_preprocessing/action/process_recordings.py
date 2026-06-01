@@ -323,7 +323,11 @@ def convert_episode(task: ConversionTask) -> str:
     if out_path.exists() and not task.overwrite:
         return f"skip (exists): {out_path}"
 
-    validate_required_files(task.episode_dir)
+    try:
+        validate_required_files(task.episode_dir)
+    except FileNotFoundError as exc:
+        return f"WARN skip (missing files): {exc}"
+
     instruction = load_session_instruction(task.episode_dir)
     if task.dry_run:
         return f"dry-run ok: {task.episode_dir.name} -> {out_path.name}"

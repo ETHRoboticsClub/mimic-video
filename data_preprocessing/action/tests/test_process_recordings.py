@@ -221,6 +221,22 @@ def test_missing_required_files_fail_clearly(tmp_path: pathlib.Path):
         raise AssertionError("expected missing file error")
 
 
+def test_convert_episode_skips_missing_required_files(tmp_path: pathlib.Path):
+    fixture = create_recordings_fixture(tmp_path, include_all_files=False)
+    out_dir = tmp_path / "out"
+    out_dir.mkdir()
+
+    from data_preprocessing.action.process_recordings import ConversionTask, convert_episode
+
+    msg = convert_episode(
+        ConversionTask(fixture["episode_dir"], 0, out_dir, 50, True, False)
+    )
+
+    assert msg.startswith("WARN skip (missing files):")
+    assert "yam_right.mcap" in msg
+    assert not (out_dir / "episode_0000.zarr").exists()
+
+
 def test_missing_session_instruction_fails_clearly(tmp_path: pathlib.Path):
     fixture = create_recordings_fixture(tmp_path)
     meta_path = fixture["episode_dir"] / "session_meta.json"
