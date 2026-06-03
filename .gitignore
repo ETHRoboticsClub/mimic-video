@@ -17,3 +17,4 @@ data
 **/.ipynb_checkpoints/
 *.nbconvert.ipynb
 notebooks/results/
+.env.secrets

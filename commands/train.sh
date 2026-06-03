@@ -2,29 +2,21 @@
 set -euo pipefail
 
 EXPERIMENT="${EXPERIMENT:-w2a_yams_v2w_pretrained_cosmos_lr1.000e-04_layer20_bsz128}"
-VIDEO_CKPT="${VIDEO_CKPT:-checkpoints/video_backbone/cosmos-predict2_v2w_480p_10fps.pt}"
+# VIDEO_CKPT="${VIDEO_CKPT:-checkpoints/video_backbone/cosmos-predict2_v2w_480p_10fps.pt}"
+VIDEO_CKPT="${VIDEO_CKPT:-/workspace/cosmos2.5-video/2b_groot_gr1_480_run1/generate_samples_smoke-1/checkpoints/iter_000005500/model_ema_bf16.pt}"
 MASTER_PORT="${MASTER_PORT:-12341}"
 NUM_VAL_EPISODES="${NUM_VAL_EPISODES:-0}"
 RUN_VALIDATION="${RUN_VALIDATION:-false}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+NVME="${NVME:-/nvme}"
+export UV_PROJECT_ENVIRONMENT="/workspace/.venv"
+
+mkdir -p "$(dirname "${UV_PROJECT_ENVIRONMENT}")"
 DATA_DIR="${DATA_DIR:-${REPO_ROOT}/data/teleop_converted}"
-TORCHRUN="${TORCHRUN:-${REPO_ROOT}/model/.venv/bin/torchrun}"
-
-detect_gpu_count() {
-  if command -v nvidia-smi >/dev/null 2>&1; then
-    nvidia-smi --query-gpu=name --format=csv,noheader | wc -l | tr -d '[:space:]'
-    return
-  fi
-  echo "0"
-}
-
-NPROC_PER_NODE="${NPROC_PER_NODE:-$(detect_gpu_count)}"
-if ! [[ "${NPROC_PER_NODE}" =~ ^[0-9]+$ ]] || [[ "${NPROC_PER_NODE}" -lt 1 ]]; then
-  echo "No GPUs detected. Set NPROC_PER_NODE explicitly if this is expected." >&2
-  exit 1
-fi
+TORCHRUN="${TORCHRUN:-${UV_PROJECT_ENVIRONMENT}/bin/torchrun}"
+NPROC_PER_NODE=4
 
 if [[ ! -x "${TORCHRUN}" ]]; then
   echo "torchrun not found at ${TORCHRUN}. Run 'uv sync --extra cu128' from ${REPO_ROOT}/model first." >&2

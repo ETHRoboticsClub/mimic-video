@@ -1,12 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CHECKPOINT_DIR="$REPO_ROOT/model/checkpoints"
 T5_DIR="$CHECKPOINT_DIR/text_encoder/t5-11b"
+NVME="${NVME:-/nvme}"
+if [[ -z "${UV_PROJECT_ENVIRONMENT:-}" ]]; then
+  if [[ -d "/workspace/.venv" ]]; then
+    export UV_PROJECT_ENVIRONMENT="/workspace/.venv"
+  else
+    export UV_PROJECT_ENVIRONMENT="${NVME}/mimic-video-venv"
+  fi
+fi
+mkdir -p "$(dirname "${UV_PROJECT_ENVIRONMENT}")"
 
 cd "$REPO_ROOT/model"
-source .venv/bin/activate
+source "${UV_PROJECT_ENVIRONMENT}/bin/activate"
 
 echo "Downloading T5-11B text encoder to $T5_DIR"
 if [[ -f "$T5_DIR/pytorch_model.bin" ]]; then

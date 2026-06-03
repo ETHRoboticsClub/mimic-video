@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 S3_URI="${S3_URI:-s3://ethrc-ml-data-916780037007/robot-learning/checkpoints/cosmos/iter_000007000_fused.pt}"
 CHECKPOINT_PATH="${CHECKPOINT_PATH:-$REPO_ROOT/model/checkpoints/video_backbone/cosmos-predict2_v2w_480p_10fps.pt}"

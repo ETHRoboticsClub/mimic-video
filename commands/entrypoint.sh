@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 log() {
   echo "[teleop-entrypoint] $*" >&2
@@ -89,10 +89,10 @@ MEM_GIB="$(detect_mem_gib)"
 export NUM_WORKERS="${NUM_WORKERS:-$(recommend_preprocess_workers "${CPU_COUNT}" "${MEM_GIB}")}"
 log "preprocessing will use NUM_WORKERS=${NUM_WORKERS} (detected cpu=${CPU_COUNT}, mem=${MEM_GIB}GiB)"
 
-run_step "setup aws/python environment" "${REPO_ROOT}/commands/setup_aws.sh"
-run_step "download Cosmos checkpoint" "${REPO_ROOT}/commands/download_cosmos_checkpoint.sh"
-run_step "download T5 checkpoint" "${REPO_ROOT}/commands/download_t5.sh"
-run_step "download teleop recordings" "${REPO_ROOT}/commands/teleop/download.sh"
-run_step "preprocess teleop recordings" "${REPO_ROOT}/commands/teleop/preprocess.sh"
-run_step "precompute teleop language embeddings" "${REPO_ROOT}/commands/teleop/embeddings.sh"
-run_step "train teleop model" "${REPO_ROOT}/commands/teleop/train.sh" "$@"
+run_step "setup aws/python environment" "${REPO_ROOT}/commands/other/setup_aws.sh"
+run_step "download Cosmos checkpoint" "${REPO_ROOT}/commands/other/download_cosmos_checkpoint.sh"
+run_step "download T5 checkpoint" "${REPO_ROOT}/commands/other/download_t5.sh"
+run_step "download teleop recordings" "${REPO_ROOT}/commands/download.sh"
+run_step "preprocess teleop recordings" "${REPO_ROOT}/commands/preprocess.sh"
+run_step "precompute teleop language embeddings" "${REPO_ROOT}/commands/embeddings.sh"
+run_step "train teleop model" "${REPO_ROOT}/commands/train.sh" "$@"
