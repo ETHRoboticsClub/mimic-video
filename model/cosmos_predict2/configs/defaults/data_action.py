@@ -42,7 +42,7 @@ class MockBridgeDataset:
         return "mock_bridge"
 
 
-def get_data_config(config_name: str):
+def get_data_config(config_name: str, **overrides):
     omegaconf.OmegaConf.register_new_resolver("eval", eval, replace=True)
     omegaconf.OmegaConf.register_new_resolver("ObsType", ObsType.__getitem__, replace=True)
     omegaconf.OmegaConf.register_new_resolver("LieRepr", LieRepr.__getitem__, replace=True)
@@ -53,6 +53,8 @@ def get_data_config(config_name: str):
         config_path="../dataloading/",
     ):
         cfg = hydra.compose(config_name=config_name)
+    if overrides:
+        cfg = omegaconf.OmegaConf.merge(cfg, overrides)
     omegaconf.OmegaConf.resolve(cfg)
 
     return cfg
