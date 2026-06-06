@@ -307,11 +307,14 @@ class World2ActionModel(ImaginaireModel):
         loss = F.mse_loss(vt_B_HA_A, ut_B_HA_A, reduction=self.loss_reduce) * self.loss_scale
 
         with torch.no_grad():
+            x0_pred_B_HA_A = xt_B_HA_A - t_B_HA_1 * vt_B_HA_A
+            l1_loss = F.l1_loss(x0_pred_B_HA_A, x0_B_HA_A, reduction=self.loss_reduce)
             var_inst_x0 = x0_B_HA_A.float().var(dim=(1, 2)).mean()
 
             metrics = torch.stack(
                 [
                     loss.float(),
+                    l1_loss.float(),
                     var_inst_x0,
                 ],
                 dim=0,
@@ -321,7 +324,8 @@ class World2ActionModel(ImaginaireModel):
             if not dist.is_available() or not dist.is_initialized() or parallel_state.get_data_parallel_rank() == 0:
                 output_batch = {
                     "loss": metrics[0].item(),
-                    "Var_inst[x_0]": metrics[1].item(),
+                    "action_l1": metrics[1].item(),
+                    "Var_inst[x_0]": metrics[2].item(),
                 }
             else:
                 output_batch = {}
