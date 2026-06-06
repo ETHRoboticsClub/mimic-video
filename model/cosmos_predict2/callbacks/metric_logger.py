@@ -3,23 +3,24 @@
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+"""WandB metric logging callback for cosmos-predict2 action-decoder training.
+
+Lazily initializes a WandB run on rank 0 (project/run-name/tags from env), then
+logs scalar entries of ``output_batch`` to WandB for training (every ``every_n``
+steps, under ``train/``) and validation (averaged over the val loop, under
+``val/``). No-ops gracefully if wandb is unavailable or init fails.
+"""
+
+import os
+import time
 
 import torch
-import wandb
 
 from imaginaire.callbacks.every_n import EveryN
 from imaginaire.model import ImaginaireModel
 from imaginaire.trainer import ImaginaireTrainer
-from imaginaire.utils import distributed
+from imaginaire.utils import log
+from imaginaire.utils.distributed import rank0_only
 
 
 def _scalars(output_batch: dict) -> dict[str, float]:
@@ -36,18 +37,41 @@ def _scalars(output_batch: dict) -> dict[str, float]:
 
 
 class MetricLogger(EveryN):
-    """Logs scalar entries of ``output_batch`` to wandb.
-
-    Train metrics are logged every ``every_n`` steps under ``train/``. Validation metrics are
-    averaged over the validation loop and logged once under ``val/``. No-ops if no wandb run exists.
-    """
+    """Initializes WandB and logs train/val ``output_batch`` scalars (e.g. action_l1). Rank-0 only."""
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+        self._wandb = None
+        self._init_attempted = False
+        self._last_step_time = None
         self._val_sums: dict[str, float] = {}
         self._val_count = 0
 
-    @distributed.rank0_only
+    @rank0_only
+    def _lazy_init(self) -> None:
+        if self._init_attempted:
+            return
+        self._init_attempted = True
+        try:
+            import wandb
+        except ImportError:
+            log.warning("MetricLogger: 'wandb' package not installed; skipping WandB logging.")
+            return
+
+        project = os.environ.get("WANDB_PROJECT", "vam")
+        run_name = os.environ.get("WANDB_RUN_NAME") or os.environ.get("WANDB_NAME")
+        tags_env = os.environ.get("WANDB_TAGS", "")
+        tags = [t.strip() for t in tags_env.split(",") if t.strip()] or None
+
+        try:
+            wandb.init(project=project, name=run_name, tags=tags, resume="allow", reinit=False)
+            self._wandb = wandb
+            log.info(f"MetricLogger: wandb.init OK — project={project} run={wandb.run.name} url={wandb.run.url}")
+        except Exception as e:
+            log.warning(f"MetricLogger: wandb.init failed ({type(e).__name__}: {e}); continuing without WandB.")
+            self._wandb = None
+
+    @rank0_only
     def every_n_impl(
         self,
         trainer: ImaginaireTrainer,
@@ -57,11 +81,21 @@ class MetricLogger(EveryN):
         loss: torch.Tensor,
         iteration: int,
     ) -> None:
-        if wandb.run is None:
+        self._lazy_init()
+        if self._wandb is None:
             return
-        scalars = {f"train/{key}": value for key, value in _scalars(output_batch).items()}
-        if scalars:
-            wandb.log(scalars, step=iteration)
+
+        payload = {f"train/{key}": value for key, value in _scalars(output_batch).items()}
+        now = time.time()
+        if self._last_step_time is not None:
+            payload["train/iter_time_s"] = now - self._last_step_time
+        self._last_step_time = now
+
+        if payload:
+            try:
+                self._wandb.log(payload, step=int(iteration))
+            except Exception as e:
+                log.warning(f"MetricLogger: train log failed ({type(e).__name__}: {e})")
 
     def on_validation_start(self, model: ImaginaireModel, dataloader_val, iteration: int = 0) -> None:
         self._val_sums = {}
@@ -82,9 +116,15 @@ class MetricLogger(EveryN):
             self._val_sums[key] = self._val_sums.get(key, 0.0) + value
         self._val_count += 1
 
-    @distributed.rank0_only
+    @rank0_only
     def on_validation_end(self, model: ImaginaireModel, iteration: int = 0) -> None:
-        if wandb.run is None or self._val_count == 0:
+        if self._val_count == 0:
+            return
+        self._lazy_init()
+        if self._wandb is None:
             return
         means = {f"val/{key}": total / self._val_count for key, total in self._val_sums.items()}
-        wandb.log(means, step=iteration)
+        try:
+            self._wandb.log(means, step=int(iteration))
+        except Exception as e:
+            log.warning(f"MetricLogger: val log failed ({type(e).__name__}: {e})")
